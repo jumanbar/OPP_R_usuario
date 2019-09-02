@@ -1,0 +1,3 @@
+# Salidas
+
+En esta carpeta se guardarán archivos de salida creados con R, tales como imágenes .png, tablas (.csv, .txt, etc...) u otros...
