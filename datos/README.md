@@ -6,3 +6,5 @@ En esta carpeta se guardan archivos de datos, tales como tablas o matrices. Incl
 - Objetos de R (.RData).  
 - Planillas electrónicas (.xls, .xslx, .ods, etc...).  
 - Documentos de referencia de los datos (metadatos; .doc, .docx, .pdf, etc...).  
+
+**¡ESTOS ARCHIVOS NO DEBEN SER MODIFICADOS!**
