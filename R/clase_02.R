@@ -1,3 +1,10 @@
+# Capacitación de R: nivel USUARIO
+# Clase 1: Objetos de R
+# Autor: Juan Manuel Barreneche Sarasola
+# **************************************
+
+# ADVERTENCIA: la clase contiene apuntes incompletos.
+
 # Vectores ----
 # Secuencias de elementos de un mismo tipo
 x <- c(10, 5, -3)
