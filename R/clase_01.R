@@ -13,7 +13,10 @@
 # 1. Código   | 3. Ambiente
 # --- --- --- | --- --- ---
 # 2. Consola  | 4. Gráficos
-# 
+
+
+# Nota: acceda a los atajos de RStudio con el atajo:
+# Alt+Shift+K
 
 ### * Consola (panel 2) ----
 
