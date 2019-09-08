@@ -1,5 +1,5 @@
 # Capacitación de R: nivel USUARIO
-# Clase 1: Objetos de R
+# Clase 2: Objetos de R
 # Autor: Juan Manuel Barreneche Sarasola
 # **************************************
 
