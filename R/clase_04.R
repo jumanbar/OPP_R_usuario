@@ -6,9 +6,16 @@
 library(tidyverse)
 
 # Filtrar sin filter ----
+filter(hog, dpto == 2)
+
+x <- 6:10
+w <- which(x > 7.5)
 x[x > 4]
+x[w]
 
 hog[hog$dpto == 2,]
+w <- which(hog$dpto == 2)
+hog[w,]
 
 # Recodificar on if_else: nueva columna = urbrur
 # 
@@ -18,7 +25,8 @@ hog <-
   hog %>% 
   mutate(
     mdeointtp = if_else(region_3 == 1, 1, 2),
-    urbrur    = if_else(region_4  < 3, 1, 2))
+    urbrur    = if_else(region_4  < 3, 1, 2)
+    )
 
 class(hog$mdeointtp) <- "haven_labelled"
 attr(hog$mdeointtp, "label") <- "Total país dividido entre Montevideo e interior"
@@ -37,6 +45,7 @@ hog %>% distinct(region_3, region_4, mdeointtp, urbrur)
 hog %>% 
   group_by(urbrur) %>% 
   summarise(n = n())
+hog %>% count(urbrur)
 
 # Ejercicio 1 ----
 #
@@ -56,12 +65,37 @@ hog %>%
 # 2. Crear, utilizando case_when, la variable sjefe, en la tabla per, 
 # siguiendo las reglas:
 #
-# e30 | e27 | sjefe  
+# e30 | e26 | sjefe  
 #   1 |   1 |     1
 #   1 |   2 |     2
 
 # Respuestas: ─────────────────────
 
+hog <- 
+  hog %>% 
+  mutate(urbrur = 
+           recode(as.integer(region_4),
+                  `1` = 1, `2` = 1,
+                  .default = 2))
+           # recode(as.integer(region_4),
+           #        1, 1, 2, 2))
+           # recode(as.integer(region_4),
+           #        `1` = 1, `2` = 1,
+           #        `3` = 2,  `4` = 2))
+
+count(hog, region_4, urbrur)
+
+# e30 | e26 | sjefe  
+#   1 |   1 |     1
+#   1 |   2 |     2
+per <-
+  per %>% 
+  mutate(sjefe = case_when(
+    e30 == 1 & e26 == 1 ~ 1,
+    e30 == 1 & e26 == 2 ~ 2,
+    TRUE ~ 0
+  ))
+per %>% distinct(e30, e26, sjefe)
 
 # ─────────────────────────────────
 
@@ -120,8 +154,73 @@ per %>% count(parentesco)
 # ─────────────────────────────────
 
 # mutate_all ----
+# 
+hog$nombarrio %>% unique %>% sort
+
+?mutate_all
+
+x <- c("Villa Espa¦ola", "Villa Mu¦oz, Retiro")
+
+hog %>% 
+  mutate_all(
+    function(columna) gsub("¦", "ñ", columna))
+
+hog %>% 
+  mutate_if(
+    is.character,
+    function(columna) gsub("¦", "ñ", columna)) %>% 
+  distinct(nombarrio)
+
+hog %>% 
+  mutate(nombarrio = gsub("¦", "ñ", nombarrio)) 
 
 # Fusionar tablas ----
+hp <- left_join(hog, per, by = "numero")
+hp <- left_join(hog, per)
+names(hp) %>% tibble %>% View
+
+c("anio", "numero", "dpto", "nomdpto", "secc", "segm", "locagr", "nom_locagr", "ccz", "barrio", "nombarrio", "mes", "estred13", "region_3", "region_4", "pesoano", "pesotri", "pesomen")
+
+# ggplot2 ----
+
+p <-
+  ggplot(hog) +
+  aes(x = HT11) +
+  geom_histogram()
+
+p
+print(p)
+
+p + scale_x_log10() +
+  ggtitle("Ingresos", "Subtítulo") +
+  xlab("Ingreso en pesos") +
+  ylab("Cantidad de hogares")
+
+ggplot(hog) +
+  aes(x = HT11, fill = nomdpto) +
+  geom_histogram() +
+  scale_x_log10() +
+  ggtitle("Ingresos", "Subtítulo") +
+  xlab("Ingreso en pesos") +
+  ylab("Cantidad de hogares")
+
+
+ggplot(hog) +
+  aes(x = HT11, fill = nomdpto) +
+  geom_histogram() +
+  scale_x_log10() +
+  facet_grid(as.character(region_3) ~ as.character(region_4))
+
+sapply(hog, class)
+
+hog %>% mutate(
+  region_3 = as.character(region_3),
+  region_4 = as.character(region_4),
+) %>%
+  ggplot() +
+  aes(x = d25, y = HT11, shape = region_4, color = region_4) +
+  geom_point() +
+  scale_y_log10()
 
 # spread gather ---- 
 
