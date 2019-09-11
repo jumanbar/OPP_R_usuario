@@ -4,6 +4,7 @@
 # **************************************
 
 library(tidyverse)
+
 # Ejercicio 1 -----
 # Cargar las tablas que preparé para la clase...
 # a. Importar H_2018_Terceros_seleccion.dat, creando un objeto llamado
@@ -13,6 +14,16 @@ library(tidyverse)
 # c. Examinar las diferencias entre ambos objetos y determinar por qué existen y
 #    cómo puedo darme cuenta de que son diferentes sin examinarlos visualmente.
 # Respuestas: ─────────────────────
+hog_prueba <- read_delim("datos/ECH2018/H_2018_Terceros_seleccion.dat", 
+                         "\t", escape_double = FALSE, trim_ws = TRUE)
+View(hog_prueba)
+
+hog <- read_sav("datos/ECH2018/H_2018_Terceros_seleccion.sav")
+
+View(hog)
+hog
+
+attributes(hog$dpto)
 
 # ─────────────────────────────────
 
@@ -41,7 +52,12 @@ hog["dpto"]
 # Notar que la columna dpto es numérica, pero tiene asociadas etiquetas a cada
 # uno de sus valores
 
-str(hog$dpto)
+View(hog)
+str(hog)
+dim(hog)
+sapply(hog, class) # Aplicar la función class a todas las columnas
+
+count(hog, nomdpto, region_4)
 
 # También es práctico encontrar que al ver la tabla, aparecen etiquetas 
 View(hog)
@@ -100,6 +116,10 @@ hog %>% pull(nombarrio) # nombarrio es una columna de hog
 # de tubo al final:
 hog %>% pull(nombarrio) %>% unique %>% sort
 
+hog %>% 
+  pull(nombarrio) %>%
+  unique %>%
+  sort
 # Básicamente hay que pensarlo así:
 # ENTRADA %>% SALIDA-ENTRADA %>% ... %>% SALIDA
 
@@ -127,6 +147,9 @@ browseURL("https://www.rstudio.com/resources/cheatsheets/")
 # * * select ----
 # Por ejemplo, en el caso de la tabla hog, una buena forma de mirar sólo las
 # columnas que nos interesan es usar la función select:
+
+hog %>% select(dpto)
+ 
 hog %>% select(nomdpto, nombarrio, secc, segm, ccz)
 
 # Esto sería equivalente a:
@@ -171,6 +194,13 @@ hog %>%
 hog %>% 
   filter(dpto == 2 & region_4 == 3)
 
+attributes(hog$dpto)
+
+hog %>% 
+  filter(dpto == 2 | dpto == 13 | dpto == 15)
+?filter
+hog %>% filter(dpto = 2)
+
 # Con estos ejemplos, además de mostrar la utilidad de filter, la intención es
 # exponer la forma en que el tubo permite ir acumulando comandos de a una línea.
 # Esto es fácil de leer y de escribir.
@@ -191,12 +221,24 @@ hog %>%
 
 # * * mutate ----
 #
+
+hog %>% mutate(x = 1) %>% select(x)
+
 # Esta función es sumamente útil... crea una nueva columna (o modifica una ya
 # existente), basada en una fórmula o función, y otras columnas:
 hog %>% 
   mutate(ingpers = HT11 / d25) %>%
   select(HT11, d25, ingpers) %>% 
-  arrange(desc(ingpers))
+  arrange(desc(ingpers)) %>% 
+  View
+
+hog %>% 
+  mutate(ingpers = HT11 / d25) %>%
+  select(nomdpto, HT11, d25, ingpers)
+  arrange(desc(ingpers)) %>% 
+  group_by(nomdpto) %>% 
+  summarise(ipmean = mean(ingpers), 
+            maxip = max(ingpers))
 
 # Este es un buen momento para mostrar el uso de group_by:
 hog %>% 
@@ -215,12 +257,25 @@ hog %>%
   summarise(ht11_max = max(HT11)) %>% 
   mutate(ypcvl = ht11_max / ht19)
 
+hog %>% 
+  mutate(ingpers = HT11 / d25) %>%
+  group_by(nomdpto) %>% 
+  summarise(q0 = min(ingpers),
+            q1 = quantile(ingpers, .2),
+            q2 = quantile(ingpers, .4),
+            q3 = quantile(ingpers, .6),
+            q4 = quantile(ingpers, .8),
+            q5 = max(ingpers))
 
 # * * * Recodificar variables ----
 # 
 # if_else : caso sencillo, divide el conjunto en dos
 hog %>%
   mutate(tresomas = if_else(d25 >= 3, "3 o más", "1 o 2")) %>% 
+  select(1:5, tresomas)
+
+hog %>%
+  mutate(tresomas = if_else(d25 >= 3, 1, 2)) %>% 
   select(1:5, tresomas)
 
 # Por ejemplo, la variable MDEOINTTP se codifica con este código en SPSS
@@ -261,157 +316,6 @@ hog %>% count(mdeointtp)
 # Respuestas: ─────────────────────
 
 # ─────────────────────────────────
-
-# recode : convierte 1 valor en otro, relación 1 a 1
-hog %>% 
-  mutate(mesabr = recode(
-    as.integer(mes),
-    `1` = "Ene",
-    `2` = "Feb",
-    `3` = "Mar",
-    `4` = "Abr",
-    `5` = "May",
-    `6` = "Jun",
-    `7` = "Jul",
-    `8` = "Ago",
-    `9` = "Set",
-    `10` = "Oct",
-    `11` = "Nov",
-    `12` = "Dic"
-    )) %>% 
-  select(mes, mesabr)
-
-# Se imagina crear la variable urbrur utilizando recode en vez de if_else?
-
-# case_when : el más sofisticado de los casos y el que uso más frecuentemente.
-
-# *parentesco (conyuge, hijos, otros parientes, otros no parientes excluido servicio doméstico).
-# if (e30 = 2) conyuge = 1 .
-# if (e30>=3 and e30<=5) hijo=1.
-# if (e30=3 ) hijoambos=1.
-# if (e30=4 or e30=5) hijouno=1.
-# if (e30>=6 and e30<=12) otropar=1.
-# if (e30 = 13) otronopa = 1 .
-# if(e30=14) servdom=1.
-# 
-# recode conyuge hijo hijoambos hijouno otropar otronopa servdom (sysmis=0).
-per <- 
-  per %>% 
-  mutate(parentesco = case_when(
-    e30 == 2 ~ "conyuge",
-    e30 >= 3 & e30 <= 5 ~ "hijo", # Esta se superpone con las dos siguientes
-    e30 == 3 ~ "hijoambos",
-    e30 == 4 | e30 == 5 ~ "hijouno",
-    e30 >= 6 & e30 <= 12 ~ "otropar",
-    e30 == 13 ~ "otronopa",
-    e30 == 14 ~ "servdom"
-  ))
-
-per %>% count(parentesco)
-
-# El caso de count, es un wrapper de group_by y summarise
-hog %>% count(nomdpto, region_4)
-
-hog %>% count(nomdpto, region_4) %>% 
-  arrange(nomdpto, desc(n)) %>% View
-
-# Ejercicio 3 ----
-#
-# crear la variable sexojefe, siguiendo la premisa:
-# 
-# *sexo del jefe.
-
-# if (e30=1 and e26=1)jefehom=1.
-# if (e30=1 and e26=2)jefemuj=1.
-# 
-# recode jefehom jefemuj (sysmis=0).
-# execute.
-
-
-
-# Seleccionar hogares en Artigas, Salto y Rivera, en zonas rurales
-#
-# Operadores lógicos útiles:
-# <  <=   is.na() %in%  | xor()
-# >  >=  !is.na()    !  &
-# 
-# Respuestas: ─────────────────────
-
-# ─────────────────────────────────
-
-# Hogares en artigas, salto y rivera cuyos ingresos en dinero sean mayores a la
-# media de los hogares de todo el país consultados en la encuesta. Me interesa
-
-attributes(hog$h155_1)
-
-j <- 
-  sapply(hog, attr, which = "label") %>%
-  grep("Monto", .)
-
-monto <- hog %>% 
-  select(j) %>% 
-  apply(1, sum)
-
-hog$monto <- monto
-
-mean(monto)
-
-hog %>% 
-  filter(dpto %in% c(2, 13, 15) & monto >= mean(monto)) %>% 
-  select(numero, dpto, )
-  
-
-# A tener en cuenta... tiene sentido usar el promedio? Sería mejor capaz usar el promedio en escala logarítmica
-
-lmean <- hog %>% filter(h155_1 > 0) %>% pull(h155_1) %>% log10 %>% mean
-mean0 <- hog %>% filter(h155_1 > 0) %>% pull(h155_1) %>% mean
-10**lmean
-mean(hog$h155_1)
-
-# Contabilizar la proporción de estos hogares que son mayores al promedio nacional, 
-# separando por departamento.
-# 
-# 
-
-# h155_1 es monto percibido en dinero:
-hog %>% pull(h155_1) %>% mean
-hog %>% pull(h155_1) %>% median
-
-# Qué raro esto de la mediana...
-hog %>% pull(h155_1) %>% summary
-
-# Este resumen nos da un indicio de que hay muchos ceros en los datos
-nceros <- hog %>% 
-  filter(h155_1 == 0) %>% 
-  nrow
-nceros / nrow(hog)
-# 93 %
-
-hog %>% 
-  mutate(escero = h155_1 == 0) %>%
-  group_by(nomdpto) %>% 
-  summarise(prop_ceros = sum(escero) / n()) %>% 
-  arrange(desc(prop_ceros))
-  
-
-# Veamos un histograma...
-h <- hog %>% 
-  ggplot() +
-  aes(x = h155_1) +
-  geom_histogram()
-h # Se vé demasiado apretado... tal vez con alguna transformación
-
-h + geom_vline(xintercept = mean(hog$h155_1), col = "red")
-
-h + scale_x_log10() +
-  geom_vline(xintercept = 10**lmean, col = "red") +
-  geom_vline(xintercept = mean0, linetype = 2, col = "red") +
-  geom_vline(xintercept = mean(hog$h155_1), linetype = 3, col = "red")
-
-
-# Como podrán ver, en este comando se pueden 
-group_by(iris, Species) %>% slice(1:4)
-
 
 # Clase: haven_labelled ----
 # PARÉNTESIS
