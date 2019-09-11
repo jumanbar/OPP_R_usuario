@@ -5,6 +5,11 @@
 
 library(tidyverse)
 
+# Filtrar sin filter ----
+x[x > 4]
+
+hog[hog$dpto == 2,]
+
 # Recodificar on if_else: nueva columna = urbrur
 # 
 # Repaso de lo último visto en la clase anterior: recodificar variables usando
@@ -118,6 +123,7 @@ per %>% count(parentesco)
 
 # Fusionar tablas ----
 
+# spread gather ---- 
 
 # FIN ----
 # 
