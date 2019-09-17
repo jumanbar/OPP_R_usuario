@@ -22,6 +22,9 @@ library(tidyverse)
 library(srvyr)
 library(kableExtra)
 per <- read_sav("datos/ECH2018/P_2018_TERCEROS.sav")
+# El archivo P_2018_TERCEROS.sav se puede descargar de la página de la ECH del
+# INE:
+# http://www.ine.gub.uy/c/document_library/get_file?uuid=b63b566f-8d11-443d-bcd8-944f137c5aaf&groupId=10181
 
 # Recodificación: ----
 # 
