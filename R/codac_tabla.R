@@ -8,11 +8,26 @@
 # 2: desocupados
 # 3: inactivos
 
+# Para realizar la tabla la estrategia es:
+# 
+# 1. Crear 3 tablas (total país, mvd+interior, resto de los dptos)
+# 
+# 2. Pegar las tablas con bind_rows
+# 
+# 3. Darle formato de publicación a la tabla (con el paquete kableExtra)
+
 # Importación ----
 library(haven)
 library(tidyverse)
+library(srvyr)
+library(kableExtra)
 per <- read_sav("datos/ECH2018/P_2018_TERCEROS.sav")
 
+# Recodificación: ----
+# 
+# Elegí cambiar los números por texto, y luego convertirlo en un factor ordenado
+# (ver la línea con el comando fct_relevel), de forma que las categorías
+# figuren en el mismo orden que el original.
 per <- 
   per %>% 
   mutate(
@@ -33,10 +48,20 @@ per <-
                           "Desocupados", "Inactivos"))
   )
 
+# Para comprobar que hizo algo coherente:
 count(per, codac)
 
-disp <- 
-  per %>% 
+# Diseño de muestreo ----
+#
+# Necesario para "expandir" los valores a la población total del país. La
+# función clave para realizar el contedo *ponderado* de casos es:
+#
+#     survey_total
+#
+# Funciona como un sustituto de n(): la conteos agrupados que se usa en
+# combinación con las funciones de dplyr: group_by (opcional) y summarise.
+# También sustituye a count, ya que es un wrapper de las anteriores.
+disp <- per %>% 
   as_survey_design(ids = 1, 
                    strata = c(nomdpto, estred13),
                    weights = pesoano, 
@@ -50,12 +75,23 @@ totpais <-
   mutate(p = 100 * n / sum(n)) %>% 
   mutate(nomdpto = "Total país") %>% 
   select(nomdpto, codac, p) %>% 
-  spread(codac, p) %>% 
+  spread(codac, p) %>% # Ensanchar la tabla
   mutate(`Total activos` = Ocupados + Desocupados,
          Total = `Menores de 14 años` + Ocupados + Desocupados + Inactivos)
-totpais
+
+# Nota: si no hiciera conteos ponderados, las líneas de group_by y summarise se
+# podrían sustituir por:
+#     group_by(codac) %>% 
+#     summarise(n = n()) %>%
+# o
+#     count(codac)
 
 # Totales por departamentos: ----
+#
+# A diferencia del comando anterior, aquí es necesario usar group_by dos veces,
+# para que el sum(n) que figura en la línea siguiente (para calcular el
+# porcentaje) haga la sumatoria por departamento y no sobre el total de la
+# tabla:
 codac_dpto <- 
   disp %>% 
   group_by(nomdpto, codac) %>% 
@@ -67,9 +103,10 @@ codac_dpto <-
   mutate(`Total activos` = Ocupados + Desocupados,
          Total = `Menores de 14 años` + Ocupados + Desocupados + Inactivos)
 
-codac_dpto
-
 # Montevideo - Interior: ----
+#
+# El group_by aparece 2 veces aquí, también. Notar que hago una recodificación
+# simple al principio.
 mvdint <- 
   disp %>%
   mutate(mvd = if_else(dpto == 1, "Montevideo", "Total Interior")) %>% 
@@ -82,23 +119,23 @@ mvdint <-
   mutate(`Total activos` = Ocupados + Desocupados,
          Total = `Menores de 14 años` + Ocupados + Desocupados + Inactivos)
 
-mvdint  
-
 # Tabla final: ----
+#
+# Pegar las 3 tablas con el comando bind_rows. El comando select es usado aquí
+# para reordenar las columnas.
 codac_final <- 
   bind_rows(totpais, mvdint, codac_dpto) %>% 
   select(1, 7:5, 3:4, 2) %>% 
-  filter(nomdpto != "MONTEVIDEO")
+  rename(Departamento = nomdpto) %>% 
+  filter(Departamento != "MONTEVIDEO")
 
 
 # Tabla en formato de publicación ----
 # install.packages("kableExtra")
 
-library(kableExtra)
-
-codac_final %>% 
-  rename(Departamento = nomdpto) %>% 
-  kable() %>%
+tabla_public <- 
+  codac_final %>% 
+  kable(digits = 1, format.args = list(decimal.mark = ",")) %>%
   kable_styling(
     bootstrap_options = "striped", 
     full_width = F, 
@@ -119,3 +156,5 @@ codac_final %>%
   footnote(general = "INE - ECH 2018", 
            general_title = "Fuente: ", 
            title_format = "bold")
+
+print(tabla_public)
