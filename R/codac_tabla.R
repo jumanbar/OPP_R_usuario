@@ -8,13 +8,55 @@
 # 2: desocupados
 # 3: inactivos
 
-# Para realizar la tabla la estrategia es:
+# Pasos
 # 
-# 1. Crear 3 tablas (total país, mvd+interior, resto de los dptos)
+# 1. Importar tabla personas de la ECH 2018 (per)
 # 
-# 2. Pegar las tablas con bind_rows
+# 2. Agregar a per la variable codac, en base a las columnas:
+#    e27 f66 f67 f261 f68 f106 f107 f108 f109 f110.
+#    (Nota: class(per$codac) debe ser factor o character)
 # 
-# 3. Darle formato de publicación a la tabla (con el paquete kableExtra)
+# 3. Crear objeto con especificaciones del diseño de muestreo (disp):
+#    Estratos : nomdepto y estred13
+#    Pesos    : pesoano
+# 
+# 4. Crear 3 tablas (total país, mvd+interior, resto de los dptos):
+#    a. Total país: 
+#      a.1 group_by: agrupar por codac
+#      a.2 summarise + survey_total: hacer suma ponderada de casos por categoría
+#      a.3 mutate: con las sumas y el total de casos, calcular porcentajes
+#      a.4 select y mutate: eliminar columnas sobrantes y agregar "nomdpto"
+#      a.5 spread: ensanchar la tabla, dejando nomdpto en filas y codac en 
+#                  columnas (key = codac, value = p)
+#      a.6 mutate: agregar columnas de Total de activos y Total global
+
+#    b. mvd+interior: 
+#      b.0 mutate + if_else: recodificar dpto --> MVD vs. Interior
+#      b.1 group_by: agrupar por mvd y codac
+#      b.2 summarise + survey_total: hacer suma ponderada de casos por categoría
+#      b.2.1 group_by: agrupar por mvd, preparando el siguiente paso... 
+#      b.3 mutate: con las sumas y el total de casos (por grupo), calcular
+#                  porcentajes
+#      b.4 select: eliminar columnas sobrantes y renombrar (nomdpto = mvd)
+#      a.5 spread: ensanchar la tabla, dejando nomdpto en filas y codac en 
+#                  columnas (key = codac, value = p)
+#      b.6 mutate: agregar columnas de Total de activos y Total global
+# 
+#    c. resto dptos: 
+#      c.0 filter: eliminar el caso nomdpto == "MONTEVIDEO"
+#      c.1 group_by: agrupar por nomdpto y codac
+#      c.2 summarise + survey_total: hacer suma ponderada de casos por categoría
+#      c.2.1 group_by: agrupar por nomdpto, preparando el siguiente paso... 
+#      c.3 mutate: con las sumas y el total de casos (por grupo), calcular
+#                  porcentajes
+#      c.4 select y mutate: eliminar columnas sobrantes
+#      c.5 spread: ensanchar la tabla, dejando nomdpto en filas y codac en 
+#                  columnas (key = codac, value = p)
+#      c.6 mutate: agregar columnas de Total de activos y Total global
+#      
+# 5. Pegar las tablas con bind_rows, ordenar las columnas con select
+# 
+# 6. Darle formato de publicación a la tabla (con el paquete kableExtra)
 
 # Importación ----
 library(haven)
@@ -31,12 +73,12 @@ per <- read_sav("datos/ECH2018/P_2018_TERCEROS.sav")
 # Elegí cambiar los números por texto, y luego convertirlo en un factor ordenado
 # (ver la línea con el comando fct_relevel), de forma que las categorías
 # figuren en el mismo orden que el original.
-per <- 
+per <- # Asignación para actualizar tabla per
   per %>% 
   mutate(
-    codac = ifelse(e27 < 14, 0, NA),
+    codac = ifelse(e27 < 14, 0, NA), # Codificar menores de 14 años
     codac = case_when(
-      e27 < 14 ~ "Menores de 14 años",
+      e27 < 14 ~ "Menores de 14 años", # case_when debe cubrir todos los casos
       ((e27 >= 14) & ((f66 == 1) | 
                         (f67 == 1 & (f261 == 3 | f261 == 1)) | 
                         (f68 == 1))) ~ "Ocupados",
@@ -44,8 +86,9 @@ per <-
          ((f106 == 1 & (f107 == 1 | f109 == 1) &
              (f110 > 0 & f110 <= 6)) | 
             (f106 == 1 & (f108 == 2 | f108 == 3)))) ~ "Desocupados",
-      TRUE ~ "Inactivos"
+      TRUE ~ "Inactivos" # Todo lo que no entró en las categorías anteriores
     ),
+    # Convertir a codac en factor ordenado (para coherencia en el orden):
     codac = fct_relevel(codac, 
                         c("Menores de 14 años", "Ocupados", 
                           "Desocupados", "Inactivos"))
@@ -69,6 +112,16 @@ disp <- per %>%
                    strata = c(nomdpto, estred13),
                    weights = pesoano, 
                    variables = c(dpto, nomdpto, codac))
+
+# Observación: utilizando la tabla per podemos obtener conteos de las 
+# categorías:
+per %>% group_by(codac) %>% summarise(n = n()) # = count(per, codac)
+
+# Pero esta no es una suma ponderada. Para ello es necesario usar survey_total:
+disp %>% group_by(codac) %>% summarise(n = survey_total())
+
+# Observación 2: el mismo resultado se obtiene sumando los pesos:
+per %>% group_by(codac) %>% summarise(n = sum(pesoano))
 
 # Totales para el país: ----
 totpais <- 
@@ -112,6 +165,7 @@ codac_dpto <-
 # simple al principio.
 mvdint <- 
   disp %>%
+  filter(nomdpto == "MONTEVIDEO") %>% 
   mutate(mvd = if_else(dpto == 1, "Montevideo", "Total Interior")) %>% 
   group_by(mvd, codac) %>% 
   summarise(n = survey_total()) %>%
@@ -144,7 +198,7 @@ tabla_public <-
     full_width = F, 
     position = "center",
     fixed_thead = T
-    ) %>% 
+  ) %>% 
   add_header_above(c(" " = 2, "Activos" = 3, " " = 2)) %>% 
   add_header_above(c("Distribución porcentual de la población total, por condición de actividad,  según departamento" = 7),
                    align = "l", font_size = "medium") %>% 
