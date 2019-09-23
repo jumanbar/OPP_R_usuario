@@ -106,6 +106,11 @@ lm(log10(HT11 + 1) ~ (cTodas + c1) ^ 2 - cTodas:c1 + 0, data = hog)
 
 browseURL("https://www.dummies.com/programming/r/how-to-use-the-formula-interface-in-r/")
 
+# La notación de fórmula tiene uso en varios contextos. Ya vimos su uso en
+# facet_grid, facet_wrap y svydesign... Otro ejemplo típico es la función plot
+# básica de R:
+plot(log10(HT11 + 1) ~ c1, data = hog)
+
 # Ejercicio 2: regresiones ----
 # 
 # 1. Hacer regresión de ingreso por hogar vs. tipo de vivienda (c1), con 
