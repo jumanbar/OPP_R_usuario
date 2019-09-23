@@ -104,6 +104,8 @@ lm(log10(HT11 + 1) ~ (cTodas + c1) ^ 2 - cTodas:c1 + 0, data = hog)
 
 ?formula
 
+browseURL("https://www.dummies.com/programming/r/how-to-use-the-formula-interface-in-r/")
+
 # Ejercicio 2: regresiones ----
 # 
 # 1. Hacer regresión de ingreso por hogar vs. tipo de vivienda (c1), con 
@@ -139,6 +141,8 @@ modelo$coefficients
 s$coefficients
 s$coefficients %>% class
 s
+
+plot(modelo)
 
 # Ejercicio 3: regresiones ponderadas ----
 #
