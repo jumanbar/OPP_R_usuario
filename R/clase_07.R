@@ -14,8 +14,10 @@ hog <-
     # El argumento .funs acepta funciones o fórmulas, en las que se puede usar
     # el punto . como sustituto por las columnas que queremos modificar. Las 
     # fórmulas son objetos con su propia sintaxis, que utilizan el caracter ~
-    # para 
+    # para separar el lado izq. del lado der. de una "ecuación":
     .funs = ~ . == "Sí") %>% 
+  # Sumar todas las columnas c5_1:c5_12. Los TRUE equivalen a 1 y los FALSE
+  # a 0:
   mutate(cTodas = c5_1 + c5_2 + c5_3 + c5_4 + c5_5 + c5_6 + c5_7 + c5_8 +
           c5_9 + c5_10 + c5_11 + c5_12) 
 
