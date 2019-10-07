@@ -14,13 +14,20 @@ dic <- function(.data, .var) {
   require(dplyr)
   require(magrittr)
   require(rlang)
+  require(haven)
   cat("\nColumn:", as.character(enquo(.var))[-1], "\n")
   v <- pull(.data, !! enquo(.var))
   cat("Label:", attr(v, "label"), "\n")
+  cat("Class:", class(v), "\n")
   
   if (!is.labelled(v)) {
-    cat("\nNo labels available. Levels present:\n")
-    v %>% unique %>% sort %>% cat(sep = "\n")
+    if (is.factor(v)) {
+      cat("Labels:\n")
+      cat(levels(v), sep = "\n")
+    } else {
+      cat("\nNo labels available. Levels present:\n")
+      v %>% unique %>% sort %>% cat(sep = "\n")
+    }
   } else {
     haven::print_labels(v)
   }
