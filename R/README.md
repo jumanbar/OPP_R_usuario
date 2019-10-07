@@ -4,6 +4,9 @@ En esta carpeta se guardan múltiples archivos con comandos escritos en lenguaje
 
 1. Ir al enlace del archivo individual (ejemplo: [clase_01.R](clase_01.R)).  
 2. Hacer click en "[Raw](https://raw.githubusercontent.com/jumanbar/OPP_R_usuario/master/R/clase_01.R)", para obtener el código puro.  
+
+![](../misc/01_captura_boton_raw.png)
+
 3. Apretar el botón del mouse y elegir "seleccionar todo".  
 4. Copiar (Ctrl+C).  
 5. Abrir un nuevo archivo de R con RStudio.  
