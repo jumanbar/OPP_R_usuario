@@ -3,20 +3,21 @@
 # Autor: Juan Manuel Barreneche Sarasola
 # **************************************
 
-## RStudio ----
-# Empezaremos haciendo una recorrida por la interfaz gráfica de RStudio
-# Se trata de un IDE (Integrated Development Environment) de gran popularidad, 
-# casi el estándar para trabajar con R al día de hoy.
-# 
+# RStudio ----
+#
+# (A partir de aquí se asume que se está trabajando en el proyecto
+# "OPP_R_usuario", contenido en el archivo OPP_R_usuario.Rproj, presente en la
+# carpeta de trabajo.)
+#
+# Empezaremos haciendo una recorrida por la interfaz gráfica de RStudio Se trata
+# de un IDE (Integrated Development Environment) de gran popularidad, casi el
+# estándar para trabajar con R al día de hoy.
+#
 # El entorno de RStudio propone 4 paneles básicos, a los que llamaremos:
-# 
-# 1. Código   | 3. Ambiente
-# --- --- --- | --- --- ---
-# 2. Consola  | 4. Gráficos
-
-
-# Nota: acceda a los atajos de RStudio con el atajo:
-# Alt+Shift+K
+#
+# | 1. Código   | 3. Ambiente |
+# +-------------+-------------+
+# | 2. Consola  | 4. Gráficos |
 
 ### * Consola (panel 2) ----
 
@@ -64,46 +65,133 @@ a <- 6 # Este es un tipo de asignación (estilo exclusivo de R)
 b = 3  # Esta también es una asignación, similar a otros lenguajes.
 a * 2
 a - 1
-a / b
-# (Si mira en el panel 3, "Ambiente", encontrará a "a" y "b" listados como
-# valores. Esta es una lista de objetos que están "disponibles" en nuestro
-# ambiente de trabajo)
+x <- a / b
+x
+
+# Los objetos creados se guardan en el ambiente o sesión, que ocupa memoria
+# (R.A.M.) y están accesibles mientras dure la sesión. La forma básica de ver la
+# lista de objetos es:
+ls()
+
+# Por otro lado RStudio tiene el panel 3, "Ambiente". Allí debería encontrar a
+# "a" y "b" listados como objetos disponibles en el ambiente de trabajo.
 
 # La creación de objetos es una piedra fundamental para trabajar con R, y para
 # programar en general.
 
-# Paréntesis: algunas funcionalidades de la consola:
+# Los objetos de nuestro espacio de trabajo se pueden guardar convenientemente
+# con las funciones save o save.image:
+
+save(a, b, file = "ab.RData")
+
+save.image("sesion_20191007.RData")
+
+# Lo escrito entre comillas son archivos que se guardaron en el disco duro (ver
+# la carpeta del curso).
+#
+# Los objetos se pueden traer con el comando load. El siguiente ejemplo sirve
+# para traer un modelo de regresión a nuestro espacio de trabajo:
+load("salidas/modelo_regresion.RData")
+ls() # Nuevos objetos: "modelo" y "p" 
+
+p # Se trata de un gráfico del tipo ggplot
+
+modelo # Se trata de una regresión ponderada con GLM
+
+# Este modelo describe la relación entre los ingresos totales por hogar
+# (incluyendo valor locativo y sin servicio doméstico: HT11) y el valor del
+# alquiler (ht14), basado en los datos de la ECH 2018. La relación matemática es
+# la siguiente:
+#
+# log10(y + 1) = s * log10(x + 1)
+#
+# En donde
+#
+# x = valor del alquiler (ht14)
+#
+# y = ingresos totales del hogar (HT11)
+# 
+# s = pendiente de la recta o coeficiente del modelo = 1.175017
+modelo$coefficients
+
+# * * Ejercicio 1 ----
+#
+# Determimnar la cantidad de ingresos que el modelo predice para un hogar en
+# el que el valor del alquiler es de 10 mil pesos... En otras palabras,
+# encontrar el valor de y esperado para x = 1e4 (diez mil).
+# 
+# Obs. 1: va a necesitar conocer las siguientes expresiones:
+#
+# log10(x) es el logaritmo de base diez de x. Ej:
+log10(100)
+
+# En R, "a elevado a la b" (potencia) se escribe: a ^ b o a ** b. Ej:
+10 ** 2
+10 ^ 2
+
+# Por último, es conviente saber que las operaciones matemáticas tienen una
+# prioridad predefinida (en la mayoría de los casos). La siguiente lista
+# (muy limitada) muestra operadores en orden de prioridad (de mayor a menor):
+# 1. ^
+# 2. - +
+# 3. * / 
+
+# Además el orden de las operaciones puede ser determinado por el usuario usando
+# paréntesis:
+(3 * 4) - 9
+3 * (4 - 9)
+
+# Para más detalles...
+?Syntax
+
+# Obs. 2: el resultado correcto es 50131.64, aunque se acepta un error de +- 15
+
+# # # # # # # # #
+
+# * * Notas 1 -----
+# 
+# Algunas funcionalidades de la consola:
+# 
 # 1. El historial de comandos ejecutados anterioermente está disponible de dos
 #    maneras: utilizando las flechas hacia arriba y hacia abajo y en la pestaña
 #    historia, del panel 3 de RStudio (arriba a la derecha)
+# 
 # 2. La posibilidad de autocompletar: si escribimos las primeras letras del
 #    nombre de un objeto cualquiera y apretamos la tecla tab, ocurrirá una 
-#    magia... ejemplo (escribir lo siguiente y apretar tab):
+#    magia... ejemplo (escribir lo siguiente observar...):
 air
 #    (en mi computadora aparecen al menos tres opciones: airmiles, airquality y 
 #    AirPassengers)
+#    Otro ejemplo:
+mod 
+#    (Acá deberían aparecer muchas opciones, incluyendo al objeto "modelo".)
+# 
 # 3. Cuando un comando no está completo, en la consola se sustituye el > inicial
 #    por un +, el cual nos indica que hay que terminar el comando... En esos 
 #    casos podemos usar la tecla Esc para cancelar (Ctrl+C en Unix). 
 #    Ejemplo, escribir "print(1 + 1" en la consola...
 #    (este es un típico ejemplo... olvidar un paréntesis!)
+# 
 # 4. La tecla Esc sirve para cancelar, tanto comandos sin completar como tareas
 #    que R está ejecutando.
 
+
 ### * Código (panel 1) ----
 
-# 1. Código   | 3. Ambiente
-# --- --- --- | --- --- ---
-# 2. Consola  | 4. Gráficos
+# | 1. Código   | 3. Ambiente |
+# +-------------+-------------+
+# | 2. Consola  | 4. Gráficos |
 
 # En esta parte de la clase abrimos este mismo archivo en panel en cuestión, que
 # no es más que un editor de *texto plano* (le queda de deber investigar qué
 # significa esto), similar a lo que es el "bloc de notas" de Windows.
 
+# Primero que nada: chequear que esté bien la codificación de caracteres...
+
 # Utilizando la interfaz gráfica de RStudio podemos tomar ventaja del sistema de
 # marcadores: cualquier línea comentada que termina en 4+ guiones o numerales
 # funciona como un marcador, el cual se puede visualizar de dos maneras:
-# Ctrl+Shift+O y con el desplegable que aparece abajo a la izquierda (encima de
+# Ctrl+Shift+o y con el desplegable que aparece abajo a la izquierda (encima de
 # la consola).
 
 # Por cierto, todo lo que se escribe a la derecha de un numeral es un
@@ -116,12 +204,23 @@ air
 # tonto hacerlo. Los archivos de código se denominan "scripts" (ie: guiones), y
 # se utilizan para tener un registro de los comandos empleados, con el fin de
 # que podamos reutilizarlos en el futuro.
+#
+# Nota: en Windows, por defecto, el explorador de archivos oculta las
+# extensiones de los archivos, lo cual quita autonomía al usuario, directa e
+# indirectamente. Esto se puede revertir en la configuración del propio
+# explorador de windows.
 
 # Una funcionalidad muy práctica de RStudio es la posibilidad de ejecutar un
 # comando directamente desde el script, utilizando Ctrl+Enter. Probar con los
 # siguientes comandos:
 x <- 1:10
+x = 1:10
+x
+print(x)
 x ^ 2
+y <- rnorm(1000)
+plot(y)
+hist(y)
 # (Observe y describa lo que realizan estos comandos.)
 
 # Usualmente los scripts de R están en permanente cambio y se pueden utilizar de
@@ -131,9 +230,9 @@ x ^ 2
 
 ### * Ambiente / Sesión de R ----
 
-# 1. Código   | 3. Ambiente
-# --- --- --- | --- --- ---
-# 2. Consola  | 4. Gráficos
+# | 1. Código   | 3. Ambiente |
+# +-------------+-------------+
+# | 2. Consola  | 4. Gráficos |
 
 # Cada vez que R se inicia, una nueva sesión de trabajo es inaugurada. En el
 # caso más común, no habrán objetos a la vista en la pestaña Environment
@@ -143,17 +242,53 @@ x ^ 2
 # tablas, matrices u otros objetos con datos, disponibles para ejecutar ejemplos
 # ilustrativos.
 
-# La sesión de trabajo se modifica cada vez que hacemos una asignación, tal como la siguiente:
+# La sesión de trabajo se modifica cada vez que:
+# 
+# 1. Hacemos una asignación, tal como la siguiente:
 impares <- 1:50 * 2 - 1
 impares
 
-# Pero hay otra forma de modificar la sesión de trabajo, y es cargando paquetes.
+# 2. Eliminamos un objeto de la sesión:
+rm(impares)
 
+# 3. Cargamos archivos RData:
+load("datos/paquetes.RData")
+ls() # Debería figurar el objeto pqts
+
+# 4. Cargamos paquetes...
+#
 # Un paquete es una colección de funciones y datos que extienden o mejoran la
-# funcionalidad de R. Por ejemplo, el paquete "lubridate" nos sirve para manejar
-# fácilmente los formatos de fechas y horas. Dicho paquete está *instalado* en
-# el disco duro de la computadora, pero cargado en nuestra sesión de trabajo.
-# Por esta razón es que aún no podemos utilizar las funciones del mismo:
+# funcionalidad de R.
+#
+# El R recién instalado no es más que, podríamos decir, un conjunto de paquetes
+# que fucionan en conjunto. Cuando iniciamos una sesión nueva, se cargan
+# automáticamente algunos de estos paquetes: aquellos que sirven para realizar
+# las tareas más básicas (paquete base), o hacer gráficos estándar (graphics),
+# estadística (stats) y más...
+#
+# El sistema de paquetes de R, por otro lado, se trata de una red de
+# repositorios en las que se encuentran para descargar paquetes creados por
+# usuarios de todo el mundo. Aquellos que se encuentran en el CRAN cumplen con
+# requisitos mínimos de calidad.
+# 
+# Esta red de paquetes es uno de los  puntos fuertes más grandes de R:
+require(ggplot2)
+ggplot(pqts, aes(as.Date(first_release), index)) +
+  geom_line(size = 1.5, col = "skyblue") +
+  scale_x_date(date_breaks = '2 year', date_labels = '%Y') +
+  scale_y_continuous(breaks = seq(0, 14000, 1000)) +
+  xlab("Año") + ylab("") + theme_bw() +
+  ggtitle("Número de paquetes de R alguna vez publicados en CRAN", 
+          "Durante 20 se ha mantenido un crecimiento exponencial.")
+
+# Volviendo a la sesión de R: cuando cargamos un paquete en la sesión, lo que
+# hacemos es habilitar la capacidad de "llamar" funciones o conjuntos de datos
+# de este paquete utilizando simplemente el nombre.
+#
+# Por ejemplo, el paquete "lubridate" nos sirve para manejar fácilmente los
+# formatos de fechas y horas. Dicho paquete está *instalado* en el disco duro de
+# la computadora, pero cargado en nuestra sesión de trabajo. Por esta razón es
+# que aún no podemos utilizar las funciones del mismo:
 ymd("2009-08-23") # Esto debería devolver un error
 
 # Para cargar un paqute en R, se utiliza la función library (o la función
@@ -161,7 +296,14 @@ ymd("2009-08-23") # Esto debería devolver un error
 library(lubridate)
 ymd("2009-08-23") # Esto debería funcionar sin errores
 
-# (Más adelante veremos para que sirve esta función.)
+# Debe notarse también que las funciones incluidas en un paquete se pueden
+# llamar sin haber cargado el paquete de antemano, utilizando el operador ::,
+# como en este ejemplo:
+lubridate::ymd("2019-03-28")
+
+# Nota: este operador puede ser importante cuando ocurre que hay 2 paquetes
+# activos en la sesión que contienen funciones con el mismo nombre. El :: nos
+# permite desambiguar los comandos.
 
 # En caso de no tener el paquete instalado, se puede instalar el mismo con el
 # siguiente comando:
@@ -176,9 +318,13 @@ install.packages("haven")
 # el panel 4 (abajo a la derecha), bajo la pestaña Paquetes. Incluso tiene
 # botones para la instalación, actualización y cargado de paquetes.
 
-# En este punto es necesario asegurarnos de que hemos entendido correctamente la diferencia entre instalar y cargar un paquete:
-# instalar  |  install.packages  |  Instala en el disco duro
-# cargar    |  library, require  |  Carga el paquete en la sesión de trabajo
+# En este punto es necesario asegurarnos de que hemos entendido correctamente la
+# diferencia entre instalar y cargar un paquete:
+#
+# | Término   |  Función/es        |  Descripción                              |
+# +-----------+--------------------+-------------------------------------------+
+# | instalar  |  install.packages  |  Instala en el disco duro                 |
+# | cargar    |  library, require  |  Carga el paquete en la sesión de trabajo |
 
 # Los paquetes accesibles a través de install.packages son los que se encuentran
 # en el CRAN (Comprehensive R Archive Network). Estos paquetes cumplen, en
@@ -191,7 +337,9 @@ browseURL("https://www.rstudio.com/products/rpackages/devtools/")
 
 ### * * Objetos y funciones ----
 
-# Como ya dijimos, crear objetos y guardarlos con algún nombre (que nos parezca informativo) es útil cuando sabemos que serán usados en el futuro. Veamos estos datos tomados de la ECH:
+# Como ya dijimos, crear objetos y guardarlos con algún nombre (que nos parezca
+# informativo) es útil cuando sabemos que serán usados en el futuro. Veamos
+# estos datos tomados de la ECH:
 
 #   Goteras en techos   SI    NO
 # Humedades       SI  1722  4148
@@ -242,15 +390,23 @@ print
 
 # Algunos ejemplos:
 c(3, 5, 23, 9:2)
+x <- c(3, 5, 23, 9:2)
 sqrt(9)
 mean(-3:3)
 mean(c(3, 5, 23, 9:2))
+mean(x)
 sum(c(3, 5, 23, 9:2))
-sum(sqrt(c(3, 5, 23, 9:2)))
+sum(sqrt(
+  c(3, 5, 23, 9:2)
+  ))
 
 dim(iris)
 
 ### * Uso de la ayuda ----
+
+# | 1. Código   | 3. Ambiente         |
+# +-------------+---------------------+
+# | 2. Consola  | 4. Gráficos / Ayuda |
 
 # Vamos a crearnos un problema de forma artificial y luego veremos 3 formas de
 # buscarle la vuelta:
@@ -303,18 +459,30 @@ help("datasets")
 help("<-")
 help(help)
 
-# Pregunta: qué comando puedo usar para buscar *sólo* dentro de un paquete
-# determinado? Por ejemplo, buscar sobre el tema anova en el paquete stats:
-# *****************************************
-# Llene con su respuesta aquí:
-
-# *****************************************
-
 # (3) Google: "R mean NA". Esta es otra forma de buscar ayuda...
+
+# Ejercicio 2 ----
+#
+# Coloque correctamente los comentarios en cada línea:
+
+c # Devuelve la cantidad de filas y columnas de una tabla o matriz
+matrix # Genera números aleatorios con distribución normal
+data.frame # Calcula el promedio de un vector
+mean # Crea un vector repitiendo los elementos del primer argumento
+rnorm # Devuelve la cantidad de elementos de un objeto
+pnorm # Realiza muestreos aleatorios de vectores
+dim # Crea una tabla de datos
+sample # Grafica un histograma básico
+which # Función de distribución acumulada de la distribución normal
+hist # Crea una matriz de valores
+length # Concatena valores para formar un vector de elementos
+rep # Determina qué elementos de un vector cumplen con una condición determinada
 
 ### * * Ayuda por aproximación ----
 
-# La función help.search sirve para buscar documentación de R sin saber previamente qué es lo que necesitamos. Por ejemplo, si nos interesa buscar funciones o ejemplos relativos a modelos lineales, podemos escribir:
+# La función help.search sirve para buscar documentación de R sin saber
+# previamente qué es lo que necesitamos. Por ejemplo, si nos interesa buscar
+# funciones o ejemplos relativos a modelos lineales, podemos escribir:
 help.search("linear model")
 ??"linear model" # Equivalente al anterior
 
@@ -374,7 +542,7 @@ c("4", "2", "u") * 3
 # c. el resto.
 
 # Ejemplo de a:
-mean(c(2:5, NA) na.rm = TRUE)
+mean(c(2:5, NA), na.rm = TRUE)
 
 # Ejemplo de b:
 mean(notas_4to_anio)
@@ -406,11 +574,11 @@ traceback()
 
 # TAREA:
 # Encontrar los errores en los siguientes comandos:
-plot(sort(rnorm(60)), pch=8, col=red, xlab="Rank", ylab="Variable Gaussiana")
+plot(sort(rnorm(60)), pch=8, col="red", xlab="Rank", ylab="Variable Gaussiana")
 
-plot(sort(rnorm(60)), pch=8, col="red", xlab="Rank" ylab="Variable Gaussiana")
+plot(sort(rnorm(60)), pch=8, col="red", xlab="Rank", ylab="Variable Gaussiana")
 
-plot(sort(rnorm(60)), pch=8, col="red", xlab="Rank", xlab="Variable Gaussiana")
+plot(sort(rnorm(60)), pch=8, col="red", xlab="Rank", ylab="Variable Gaussiana")
 
 ### * Rutas y Directorio de trabajo ----
 
@@ -549,3 +717,24 @@ browseURL("https://github.com/jumanbar/Curso-R")
 browseURL("https://github.com/jumanbar/curso_camtrapR")
 
 # FIN ------
+
+# Respuestas:
+
+# Ejercicio 1:
+s <- 1.175017 # Pendiente del modelo lineal
+x <- 1e4      # Valor de alquiler (variable independiente)
+10 ** (s * log10(x + 1)) - 1 # Predicción de ingresos para el hogar
+
+# Ejercicio 2:
+c # Concatena valores para formar un vector de elementos
+matrix # Crea una matriz de valores
+data.frame # Crea una tabla de datos
+mean # Calcula el promedio de un vector
+rnorm # Genera números aleatorios con distribución normal
+pnorm # Función de distribución acumulada de la distribución normal
+dim # Devuelve la cantidad de filas y columnas de una tabla o matriz
+sample # Realiza muestreos aleatorios de vectores
+which # Determina qué elementos de un vector cumplen con una condición det.
+hist # Grafica un histograma básico
+length # Devuelve la cantidad de elementos de un objeto
+rep # Crea un vector repitiendo los elementos del primer argumento
