@@ -25,9 +25,9 @@ En esta carpeta se guardan múltiples archivos con comandos escritos en lenguaje
 
 7. Guardar en la carpeta "OPP_R_usuario/R".
 
-![](../misc/05_captura_rstudio_guardar.png)
+![](../misc/06_captura_rstudio_guardar.png)
 
-![](../misc/05_captura_rstudio_guardar2.png)
+![](../misc/07_captura_rstudio_guardar2.png)
 
-![](../misc/05_captura_rstudio_guardar3.png)
+![](../misc/08_captura_rstudio_guardar3.png)
 
