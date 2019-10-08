@@ -3,7 +3,7 @@
 # Autor: Juan Manuel Barreneche Sarasola
 # **************************************
 
-# RStudio ----
+# I. RStudio ----
 #
 # (A partir de aquí se asume que se está trabajando en el proyecto
 # "OPP_R_usuario", contenido en el archivo OPP_R_usuario.Rproj, presente en la
@@ -19,7 +19,7 @@
 # +-------------+-------------+
 # | 2. Consola  | 4. Gráficos |
 
-### * Consola (panel 2) ----
+# I.a Consola (panel 2) ----
 
 # Es la interfaz histórica de R. Es interactiva: los comandos se ejecutan 
 # inmediatamente (ie: es un interpetador), a diferencia de otros lenguajes de
@@ -115,7 +115,9 @@ modelo # Se trata de una regresión ponderada con GLM
 modelo$coefficients
 
 # * * Ejercicio 1 ----
-#
+# 
+# * * * 1.a ----
+# 
 # Determimnar la cantidad de ingresos que el modelo predice para un hogar en
 # el que el valor del alquiler es de 10 mil pesos... En otras palabras,
 # encontrar el valor de y esperado para x = 1e4 (diez mil).
@@ -145,6 +147,34 @@ log10(100)
 ?Syntax
 
 # Obs. 2: el resultado correcto es 50131.64, aunque se acepta un error de +- 15
+
+# * * * 1.b ----
+# 
+# Considere el polinomio de 3er grado definido por esta ecuación:
+# x^2 - 4x^2  + 2x + 1
+ 
+# Podemos usar las flechas hacia arriba y hacia abajo para repetir el cálculo
+# del valor del polinomio para distintos valores:
+x <- 2
+x ^ 3 - 4 * x ^ 2 + 2 * x + 1 # - 3
+
+x <- 4
+x ^ 3 - 4 * x ^ 2 + 2 * x + 1 # 9
+
+# Los dos ejemplos anteriores nos muestran que existe al menos una raíz entre 
+# x = 2 y x = 4.
+# 
+# Busque al menos una raíz del polinomio. Si puede, encuentre las 3.
+
+# Ayuda: los siguientes comandos usan las funciones curve y abline para
+# visualizar los puntos en que el polinomio tiene raíces reales:
+curve(x ^ 3 - 4 * x ^ 2 + 2 * x + 1, from = -.5, to = 3.5)
+abline(h = 0, col = "blue")
+
+# También se pueden usar líneas verticales para ver si un valor corresponde a
+# una raíz:
+abline(v = 1, col = "red")
+
 
 # # # # # # # # #
 
@@ -176,7 +206,7 @@ mod
 #    que R está ejecutando.
 
 
-### * Código (panel 1) ----
+# I.b Código (panel 1) ----
 
 # | 1. Código   | 3. Ambiente |
 # +-------------+-------------+
@@ -216,10 +246,12 @@ mod
 x <- 1:10
 x = 1:10
 x
-print(x)
+z <- c(2, 6, 4:-2)
+print(x) # esto hace ...
 x ^ 2
 y <- rnorm(1000)
 plot(y)
+plot(sort(y))
 hist(y)
 # (Observe y describa lo que realizan estos comandos.)
 
@@ -228,7 +260,7 @@ hist(y)
 # tocan los scripts hasta que obtienen una secuencia de comandos que le
 # satisfacen.
 
-### * Ambiente / Sesión de R ----
+# I.c Ambiente / Sesión de R ----
 
 # | 1. Código   | 3. Ambiente |
 # +-------------+-------------+
@@ -402,12 +434,36 @@ sum(sqrt(
 
 dim(iris)
 
-### * Uso de la ayuda ----
+# II. Uso de la ayuda ----
 
 # | 1. Código   | 3. Ambiente         |
 # +-------------+---------------------+
 # | 2. Consola  | 4. Gráficos / Ayuda |
 
+# Conozcamos un poco más de cerca a la función rnorm:
+# 
+# Algunos ejemplos:
+rnorm(10)
+rnorm(10, 8, 6)
+rnorm(10, sd = 6)
+rnorm(10, sd = 6, mean = 8)
+
+# En qué se diferencian estos tres comandos? Qué controla cada uno de estos
+# números?
+
+# II.a Ayuda estándar ----
+# 
+# Además de experimentar directamente, podemos consultar la documentación de R:
+?rnorm
+
+# Qué indican las diferentes secciones de la página de ayuda? Observar en
+# particular Usage, Arguments, Value y Examples...
+#
+# Notar también esta función:
+example(rnorm)
+
+# Otro ejemplo: mean
+# 
 # Vamos a crearnos un problema de forma artificial y luego veremos 3 formas de
 # buscarle la vuelta:
 mean(c(3, 5, 23, 9:2, NA))
@@ -452,6 +508,24 @@ mean(c(3, 5, 23, 9:2, NA))
 # (Al leer esta definición, es claro que NA es un resultado perfectamente
 # razonable para el cálculo del promedio de una serie de números que contiene
 # NAs)
+# 
+
+# También es útil destacar que en la ayuda de NA se encuentra la función is.na,
+# que es necesaria para determinar la ubicación de los NAs que tiene un
+# determinado vector.
+
+x <- c(3, 5, 23, 9:2, NA)
+
+# Para un valor como 5, es fácil "encontrar" la posición en la que se encuentra,
+# utilizando el operador == ("igual a"):
+x == 5
+
+# Pero cuando se trata de NA, este método deja de ser válido, por motivos
+# enteramente razonables:
+x == NA
+
+# Es entonces cuando se is.na es relevante para la tarea:
+is.na(x)
 
 # El símbolo ? es una forma rápida de escribir help. Ejemplos:
 help(mean)
@@ -461,7 +535,7 @@ help(help)
 
 # (3) Google: "R mean NA". Esta es otra forma de buscar ayuda...
 
-# Ejercicio 2 ----
+# * * Ejercicio 2 ----
 #
 # Coloque correctamente los comentarios en cada línea:
 
@@ -478,7 +552,7 @@ hist # Crea una matriz de valores
 length # Concatena valores para formar un vector de elementos
 rep # Determina qué elementos de un vector cumplen con una condición determinada
 
-### * * Ayuda por aproximación ----
+# II.b Ayuda por aproximación ----
 
 # La función help.search sirve para buscar documentación de R sin saber
 # previamente qué es lo que necesitamos. Por ejemplo, si nos interesa buscar
@@ -526,12 +600,13 @@ help.search("linear model")
 # Buscar en internet el significado de "atomic vector", en el contexto de R.
 
 
-### * Errores y advertencias ----
+# III. Errores y advertencias ----
 
 # Hay dos tipos de menseajes:
 # - Advertencias = Warnings: no impiden que se complete una tarea, pero hay
 #   riesgo de que algo haya salido mal.
 as.numeric(c("4", "2", "u"))
+warnings()
 
 # - Errores: hay algún problema que impide la ejecución del comando.
 c("4", "2", "u") * 3
@@ -542,10 +617,26 @@ c("4", "2", "u") * 3
 # c. el resto.
 
 # Ejemplo de a:
-mean(c(2:5, NA), na.rm = TRUE)
+mean(c(2:5, NA) na.rm = TRUE)
 
 # Ejemplo de b:
-mean(notas_4to_anio)
+plot(sort(y), col = red)
+
+# Versiones corregidas:
+mean(c(2:5, NA), na.rm = TRUE)
+plot(sort(y), col = "red")
+
+# Ambos se tratan de casos típicos. En el primero, si bien R no nos dice "falta
+# una coma" (porque no necesariamente ese tiene por qué ser el problema), nos
+# trata de ayudar lo más posible, dado la información con la que cuenta. Note
+# que en el mensaje de error se indica el momento exacto en que encuentra "un
+# símbolo inesperado".
+#
+# En el segundo ejemplo, lo que ocurre es que quisimos indicar que el color
+# deseado para el gráfico es rojo, pero olvidamos poner las comillas. Cuando
+# escribimos un texto sin comillas, R interpeta que se trata de el nombre de un
+# objeto que debe buscar en el ambiente de trabajo actual y es por eso que
+# devuelve un "objeto no encontrado".
 
 # Cuando se trata de un comando complejo, suele ser muy útil usar la función
 # traceback:
@@ -572,15 +663,15 @@ traceback()
 # es bueno también saber seleccionar qué partes del error son las más
 # informativas y que vale la pena poner en el buscador.
 
-# TAREA:
+# * * Ejercicio 3 ----
 # Encontrar los errores en los siguientes comandos:
-plot(sort(rnorm(60)), pch=8, col="red", xlab="Rank", ylab="Variable Gaussiana")
+plot(sort(rnorm(60)), pch=8, col=red, xlab="Rank", ylab="Variable Gaussiana")
 
-plot(sort(rnorm(60)), pch=8, col="red", xlab="Rank", ylab="Variable Gaussiana")
+plot(sort(rnorm(60)), pch=8, col="red", xlab="Rank" ylab="Variable Gaussiana")
 
-plot(sort(rnorm(60)), pch=8, col="red", xlab="Rank", ylab="Variable Gaussiana")
+plot(sort(rnorm(60)), pch=8, col="red", xlab="Rank", xlab="Variable Gaussiana")
 
-### * Rutas y Directorio de trabajo ----
+# IV. Rutas y Directorio de trabajo ----
 
 # Directorio de trabajo = wd (siglas en inglés)
 
@@ -654,7 +745,9 @@ writeLines(cdo, "cdo.txt")
 # el ejemplo anterior usamos una ruta relativa en dos ocasiones: para leer y
 # para escribir el archivo cdo.txt.
 
-# Las rutas relativas se escriben en relación al lugar en donde "estamos parados". Por ejemplo, ahora estamos parados en la carpeta OPP_R_usuario. Esa carpeta tiene otras subcarpetas, como "datos":
+# Las rutas relativas se escriben en relación al lugar en donde "estamos
+# parados". Por ejemplo, ahora estamos parados en la carpeta OPP_R_usuario. Esa
+# carpeta tiene otras subcarpetas, como "datos":
 dir("datos/")
 dir("R")
 
@@ -721,9 +814,17 @@ browseURL("https://github.com/jumanbar/curso_camtrapR")
 # Respuestas:
 
 # Ejercicio 1:
+# 
+# 1.a
 s <- 1.175017 # Pendiente del modelo lineal
 x <- 1e4      # Valor de alquiler (variable independiente)
 10 ** (s * log10(x + 1)) - 1 # Predicción de ingresos para el hogar
+
+# 1.b
+# Raíces: 
+# -.3018 aprox.
+# 1
+# 3.30277 aprox.
 
 # Ejercicio 2:
 c # Concatena valores para formar un vector de elementos
