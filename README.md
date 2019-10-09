@@ -17,6 +17,10 @@ Carpetas:
 
 - Tidyverse, un conjunto de paquetes con opiniones fuertes: https://www.tidyverse.org/
 
+- R for Data Science, libro online de Garrett Grolemund y [Hadley Wickham](https://en.wikipedia.org/wiki/Hadley_Wickham): https://r4ds.had.co.nz/
+
+- Advanced R, por [Hadley Wickham](https://en.wikipedia.org/wiki/Hadley_Wickham): https://adv-r.hadley.nz/
+
 - Trencitos o "cheatsheets" para varios paquetes de R (de tidyverse): https://www.rstudio.com/resources/cheatsheets/
 
 - Libro de recetas de R (recomiendo especialmente la parte de gráficos con ggplot2): http://www.cookbook-r.com/
