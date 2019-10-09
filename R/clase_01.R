@@ -5,16 +5,22 @@
 
 # I. RStudio ----
 #
-# (A partir de aquí se asume que se está trabajando en el proyecto
-# "OPP_R_usuario", contenido en el archivo OPP_R_usuario.Rproj, presente en la
-# carpeta de trabajo.)
+# En esta clase iremos haciendo una recorrida por RStudio, aprendiendo tanto de
+# esta interfaz gráfica como de R.
 #
-# Empezaremos haciendo una recorrida por la interfaz gráfica de RStudio Se trata
-# de un IDE (Integrated Development Environment) de gran popularidad, casi el
-# estándar para trabajar con R al día de hoy.
+# RStudio es un IDE (Integrated Development Environment) de gran popularidad,
+# casi el estándar para trabajar con R al día de hoy.
 #
+# Cuando decimos R en cambio, nos podemos estar refiriendo al "ambiente de
+# computación, estadística y análisis de datos", o al programa que instalamos en
+# una computadora y usamos posteriormente, o  también al lenguaje de
+# programación a través del cual utilizamos esta herramienta. No nos vamos a
+# desvelar por tratar de hacer diferencias entre todas estas definiciones, pero
+# sí queremos dejar claro que R y RStudio son cosas diferentes (y que R "está
+# adentro", de RStudio).
+
 # El entorno de RStudio propone 4 paneles básicos, a los que llamaremos:
-#
+# 
 # | 1. Código   | 3. Ambiente |
 # +-------------+-------------+
 # | 2. Consola  | 4. Gráficos |
