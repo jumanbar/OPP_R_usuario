@@ -165,6 +165,33 @@ is.na(x)  # Este en cambio no tiene ningún NA
 x[x > 10 & !is.na(x)] <- rnorm(2)
 x
 
+# Otra opción es usar la función which:
+w <- which(x > 10)
+x[w]
+
+# * * Ejercicio 1 ----
+# 
+# Considere el vector y:
+set.seed(0)
+y <- rnorm(1e4)
+length(y)
+
+# Extraiga los elementos de y de los extremos y guárdelos en un objeto llamado
+# z. Es decir, z será un vector que contenga todos los y tales que se cumple al
+# menos una de estas condiciones:
+# 
+# - y es mayor a 1.96
+# 
+# - y es menor que -1.96
+#
+# Para esto será necesario utilizar el operador lógico |, equivalente al OR...
+# (Pista: la sintaxis es similar a la en el ejemplo anterior al which.)
+
+# Si el resultado es correcto, el porcentaje de valores en los extremos debería
+# ser cercano al 5%, por tratarse de una distribución normal estándar.
+# 
+#  ---------------------------+
+
 # También es importante tener en cuenta que cuando insertamos un valor que
 # corresponde a otra clase, el resultado puede sorprendernos (y no vamos a
 # recibir mensaje de error):
@@ -276,19 +303,22 @@ var(x, na.rm = TRUE)
 # porque no necesariamente tiene por qué significar lo mismo. De todas formas,
 # es un detalle menor.)
 
-# Matrices ----
+# II Matrices ----
 # 
 # (En verdad, también son vectores, pero encubiertos)
 # 
 # Si los vectores son 1D, las matrices son 2D:
-matrix(0, nrow = 3, ncol = 4)
-m <- matrix(0, nrow = 3, ncol = 4)
+matrix(1:12, nrow = 3, ncol = 4)
+m <- matrix(1:12, nrow = 3, ncol = 4)
 class(m)
 is.numeric(m)
+dim(m)
+length(m)
 
 # Al igual que los vectores, pueden ser de diferentes tipos, pero todos los
 # elementos tienen que ser del mismo:
-m <- matrix("0", nrow = 3, ncol = 4)
+m <- matrix(c("a", "b"), nrow = 3, ncol = 4)
+m # Observe el reciclado de elementos
 class(m)
 is.numeric(m)
 is.character(m)
@@ -297,18 +327,20 @@ is.character(m)
 # dimensión, lo cual es representado separando las filas y las columnas con una
 # coma:
 m <- matrix(c(1:6 + 3, 1:6 - 8), ncol = 4)
-m[3, 1]
-m[3, 1] <- 7
+m[3, 3]
+m[3, 3] <- 7
 m[1, 2] <- -10
+m[1, 4] <- NA
+m
 
-# Ejercicio 1 ----
+# * * Ejercicio 2 ----
 #
 # Reproducir la siguiente matriz, utilizando el comando matrix:
 
 #      [,1] [,2] [,3] [,4]
 # [1,]    1    2    3    4
-# [2,]    5    6    7    8
-# [3,]    9   10   11   12
+# [2,]    5    1    2    3
+# [3,]    4    5    1    2
 
 # (Consejo: use la ayuda para aprender más de la función matrix.)
 
@@ -316,150 +348,217 @@ m[1, 2] <- -10
 
 # Observe lo siguiente:
 m[5]
+m[3:8]
 
 # Cómo determina R qué valor corresponde a m[5]?
 
-# También aparece ahora la opción de elegir filas enteras o columnas enteras:
+# Existe también la opción de elegir filas enteras o columnas enteras:
 m[1,]
 m[,1]
 
-# Debe 
+# Debe tenerse en cuenta, que cuando extraemos una única fila o columna, el
+# objeto resultante pierde su condición de matriz:
 is.matrix(m)
 is.matrix(m[1,])
+dim(m[,1])
 
+# Para evitar esto, se puede usar el argumento drop (ver ?Extract):
+m[, 1, drop = FALSE]
 
+# Las reglas generales de los corchetes se siguen cumpliendo, incluyendo el uso
+# de vectores lógicos:
+m[c(FALSE, TRUE, TRUE),]
 
-m[lo,]
-# Notar que dejan de ser "columnas" o "filas"
-
-m[2:3, 3:4]
-
-m[2:3, 3:4] <- matrix(c(5, -5, -5, 5), 2, 2)
-
-matrix(c(5, -5, -5, 5), 2, 2)
-
-fil_col <- cbind(c(3, 1, 3, 2), 1:4)
-
-m[fil_col]
-
-class(fil_col)
-
-# **************************
-# Cómo obtener los mismos elementos de m, pero en vez de usar una matriz como fil_col, usar un vector (1D)?
-# Respuesta:
-m[c(3, 4, 9, 11)]
-# **************************
+# Para matrices también sirve la función which, pero con el agregado del
+# argumento arr.ind:
+w <- which(m >= 0, arr.ind = TRUE)
+w
+is.matrix(w)
+m[w] # Es vector atómico
 
 # * Nombres ----
+#
+# Las matrices pueden tener nombres también, pero serán nombres de filas y/o de
+# columnas:
 colnames(m)
 rownames(m)
 
 rownames(m) <- c("a", "b", "c")
+colnames(m) <- c("w", "x", "y", "z")
+m
+m["b", , drop = FALSE] # Vea como mantiene los nombres. Qué pasa si drop = TRUE?
 
 # * Operaciones ----
+#
+# Las operaciones con matrices no guardan gran sorpresa
 m + 4
 m * -1
 t(m) # Transpuesta
+sum(m)
+mean(m, na.rm = TRUE)
+colMeans(m)
+rowSums(m)
 
-m2 <- m %*% t(m)
+# R también incluye la multiplicación entre matrices:
+m[10] <- 12
+m %*% t(m)
 ?"%*%"
-
-# * Recilado ----
-matrix(1:2, 2, 6)
-matrix(1:5, 2, 6)
-matrix(1:5, 2, 6, byrow = TRUE)
 
 # * Arreglos ----
 # 
-# Son como los vectores en nD...
+# Así como pasar de vectores atómicos a matrices es cuestión de agregar una dimensión más, pasar de matrices a arrays ("arreglos"), es como saltar del 2D al 3D, o el 4D... o el nD
 ?array
-example(array)
+a <- array(1:24, dim = c(4, 3, 2))
 
-# Clases comunes -----
+# ----------------------------------------------------+
 
-# En algunos de los comandos anterriores se entrevee que las columnas tienen
-# distintas clases. Las clases son categorías en las que clasificamos los tipos
-# de información. Algunos ejemplos son:
+# III Texto (character) -----
+# 
+# El uso de comillas, simples o dobles, denotan un vector character:
+txt <- c("comillas dobles", 'comillas simples', 
+         "comillas simples 'adentro' de comillas dobles")
 
-# - Numéricos
+# Funciones de gran utilidad para trabajar con texto son: paste, substr,
+# strsplit, grep y gsub...
+# 
+# Aquí veremos ejemplos de algunas de ellas.
+# 
+# Ver más en: cheatsheet de strings.R o
+?character
 
-# - Texto ("character")
+# III.a grep y sub ----
+#
+# Es un grupo de funciones que trabaja con expresiones regulares. Las
+# expresiones regulares son herramientas muy poderosas que sirven para detectar
+# patrones en cadenas de caracteres.
+grep("comillas", txt)
+grep("simples", txt)
+grep("dobles", txt)
+grep("dobles", txt, value = TRUE)
+grep("dobles", txt, value = TRUE, invert = TRUE)
+grepl("dobles", txt)
+!grepl("dobles", txt)
 
-# - Factores (algo así como niveles o tratamientos en un experimento, por 
-# ejemplo...)
+# En particular, estos ultimos dos ejemplos son muy útiles para utilizar con
+# tablas de datos, ya que nos permiten hacer un filitrado de filas según alguna
+# columna de texto.
 
-# - Fecha y hora
+# En estos ejemplos estamos usando patrones súper simples. Veamos uno un poco
+# más abstracto:
+txt <- c("alvin87", "dOnatellO", "jammq98", "oli_007", "trUerealm")
+grep("[0-9]", txt) # Tienen dígitos
+grep("[ou]", txt, ignore.case = TRUE)  # Tienen O o U
+grep("^[aeiou]", txt, ignore.case = TRUE)  # empiezan con vocal
+grep("^[aeiou].*[aeiou]$", txt, ignore.case = TRUE) # empiezan o terminan con vocal
 
-# Las clases de los objetos en R son **muy importantes**, ya que determinan cómo
-# van a comportarse en diferentes situaciones:
-x <- 1
-x + 1
-x <- c(1, 3, 5)
-x * 5 # Multiplica a todos al mismo tiempo
-x <- c("coco", "mango", "papaya")
-x * 5
-x <- c(1, 3, "5") # ¿Y esto?
+# Para profundizar:
+?grep
+?regex
 
-# Este último ejemplo es paradigmático, ya que nos muestra como R puede
-# "mezclar" dos clases diferentes sin dar mensaje de error o avisar. Lo que
-# muchas veces ocurre es que aparece un error mucho más adelante, cuando
-# queremos usar un objeto creado de esta forma:
-x * 5
-# Error in x * 5 : non-numeric argument to binary operator
+# Un par de ejemplitos con gsub:
+gsub("O", "o", txt) # Todas las o en minúsculas
+gsub("[0-9_]+", "", txt) # Eliminar números y guiones bajos
 
-# Es parte de diseño de R y tal vez responda a alguna lógica en particular, pero
-# lo cierto es que puede generar fuertes dolores de cabeza. De hecho, muchas
-# veces cuando tenemos un error, es buena idea analizar cuáles son las clases de
-# los objetos que estamos utilizando.
+# III.b paste (y paste0) ----
+#
+# Sirven para pegar textos... paste0 es idéntico a paste, excepto que el
+# argumento sep = "". Algunos ejemplos ilustrativos:
+paste(1:5, ". ", txt)
+paste(1:5, ". ", txt, sep = "")
+paste(1:5, ". ", txt, sep = "", collapse = "; ")
 
-# Obs.: usamos la función `c`, que sirve para concatenar elementos y formar un
-# vector. Los vectores son secuencias de elementos de la misma clase.
+# Los caracteres especiales \t y \n
+txt2 <- paste(1:5, "\t", txt, sep = "", collapse = "\n")
+cat(txt2)
 
-# * Números -----
+# Qué interpreta usted de este resultado?
 
-# - numeric, ingeter: números
-x <- 1:6 # integer
+# * * Ejercicio 3 ----
+# 
+# Cocos, duraznos y mangos
+# 
+# Considere el siguiente vector:
+frutas <- sample(c("coco", "durazno", "mango"), size = 21, replace = TRUE)
+frutas # Una muestra aleatoria de frutas
+# 
+# 3.a:
+# 
+# Busque la manera de usar la función paste o paste0 y, sin saber exactamente
+# cuántas veces se repite cada valor, generar un vector similar al siguiente:
+ej<- c("Tengo unos 100 cocos", 
+       "Tengo unos 99 duraznos", 
+       "Tengo unos 50 mangos")
 
-class(x) # Esta función es muy útil
+# (La idea es que la solución debe servir para cualquier vector de frutas.)
 
-x[6] <- 5.1 # numeric
+# Para esto es clave usar la función table (y la función names):
+cuantas.frutas <- table(frutas)
+cuantas.frutas
+names(cuantas.frutas)
 
-class(x) 
-# Por qué cambió?
-# double
-# float
+# Respuesta:
 
-# * Texto -----
-txt <- c("coco", "mango", "papaya")
-paste(1:3, ". ", txt)
+# - - - - -
+# 3.b:
+#
+# Cambiar el resultado final: un único texto con la frase:
+# 
+# "Tengo unos 100 cocos, 99 duraznos y 50 mangos"
+#
+# En esta ocasión puede ser útil el argumento collapse, de la función paste o
+# paste0.
+# 
+# Respuesta:
+
+# -----------------------------+
+
 
 # Qué hizo esta función? La pongo aquí porque es bastánte útil en general (ver 
 # ?paste).
 
-# * Lógicos ----
+# IV Lógicos ----
 # 
-# Booleanos
+# También llamados booleanos
 # 
-# - lógica: vectores cuyos valores son TRUE o FALSE
+# Vectores cuyos valores son TRUE o FALSE
+# 
+x <- rpois(15, 4); x
 x > 4
 x >= 4
 x < 2
-logico <- x == 4
+logico <- x == 4; logico
 logico + 1
 logico * -5
 sum(logico)
 !logico
-# Ya vimos que los vectores lógicos sirven para filtrar elementos de un vector... esto es de gran utilidad para trabajar con tablas.
-u <- matrix(logico, 3, 5)
-!u
-# Es interesante poder combinar los operadores lógicos
-x > 4 | x <= 3 # Esto es un OR
-x > 4 & x <= 3 # Esto es un AND (por qué son todos falsos?)
-x < 4 & x >= 3 # Complemento del penúltimo ejemplo
 
+# Ya vimos que los vectores lógicos sirven para filtrar elementos de un
+# vector... esto es de gran utilidad para trabajar con tablas.
+
+# Es interesante poder combinar los operadores lógicos
+x > 5 | x <= 3 # Esto es un OR
+x > 5 & x <= 3 # Esto es un AND (por qué son todos falsos?)
+x < 5 & x >= 3 # Complemento del primer ejemplo
+x > 3 & x < 7 | x == 2 # Se pueden seguir combinando expresiones...
+
+# En el caso de && y ||, las reglas son las misas, pero se restringen a
+# comparaciones de 1 a 1:
 x[1] < 4 && x[6] > 5
 x[1] < 4 || x[6] > 5
 
+# También existe el OR exclusivo:
+xor(x >= 4, x <= 6)
+# Sólo es verdadero cuando una de las dos expresiones es verdadera, pero es
+# falso cuando AMBAS son verdaderas...
+
+# Tabla de operadores lógicos:
+# 
+# x | y | AND (&) | OR (|) | XOR | NOT x (!x)
+# --+---+---------+--------+-----+-----------+
+# T | T |   T     |   T    |  F  |     F
+# T | F |   F     |   T    |  T  |     F
+# F | T |   F     |   T    |  T  |     T
+# F | F |   F     |   F    |  F  |     T
 
 # * Factores ----
 # 
@@ -467,6 +566,8 @@ x[1] < 4 || x[6] > 5
 f <- factor(x = c(4, 1, 1, 1, 2, 2, 1, 4, 3, 1, 1, 2, 2, 3, 1, 2), 
             labels = c("primaria", "secundaria", "terciaria", "posgrado"))
 f
+
+# Los factores no son character, y esto es importante recordar.
 
 # * Fecha y hora ----
 # 
@@ -748,3 +849,25 @@ pqts %>%
   aes(year, nacum) +
   geom_point()
 
+# FIN ----
+
+
+# ----------------------------------- #
+# Respuestas
+
+# Ejercicio 1
+w <- which(y > 1.96 | y < -1.96)
+z <- y[w]
+length(z) / length(y)
+
+# Ejercicio 2
+matrix(1:5, nrow = 3,  ncol = 4, byrow = TRUE)
+
+# Ejercicio 3
+# 3.a:
+paste0("Tengo unos ", cuantas.frutas, " ", names(cuantas.frutas), "s")
+
+# 3.b
+t1 <- paste0(cuantas.frutas, " ", names(cuantas.frutas), "s")
+t2 <- paste0(t1[-length(t1)], collapse = ", ")
+paste0("Tengo unos ", t2, " y ", t1[length(t1)])
