@@ -151,7 +151,7 @@ log10(100)
 # * * * 1.b ----
 # 
 # Considere el polinomio de 3er grado definido por esta ecuación:
-# x^2 - 4x^2  + 2x + 1
+# x^3 - 4x^2  + 2x + 1
  
 # Podemos usar las flechas hacia arriba y hacia abajo para repetir el cálculo
 # del valor del polinomio para distintos valores:
