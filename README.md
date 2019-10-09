@@ -7,6 +7,22 @@ Carpetas:
 - [R](R/): archivos de código R  
 - [salidas](salidas): archivos generados desde R (como gráficos o texto)
 
+# ¿Cómo desargar el repositorio completo?
+
+¡Atención! Al descargar el repositorio completo, se incluyen archivos de git, el sistema de control de versiones.
+
+Si lo desea hacer de todas formas, utilice el botón "Clone or Download":
+
+![](descargar_repo.png)
+
+# ¿Cómo descargar/actualizar las clases individuales?
+
+Ver [este tutorial](https://github.com/jumanbar/OPP_R_usuario/blob/master/R/README.md) (aplica para todos los archivos de texto plano, como .txt, .csv, md, etc., presentes en el respositorio).
+
+# ¿Cómo descargar archivos binarios individuales (.pdf, .zip, .RData, etc)?
+
+Pinchar el archivo con el mouse y luego pinchar "view raw". En el menú que aparece, seleccionar "guardar archivo", para descargarlo en la carpeta de descargas por defecto.
+
 # Enlaces y materiales de interés:
 
 - La cuenta de Twitter en la que comparto noticias, materiales, y más: https://twitter.com/imser_
