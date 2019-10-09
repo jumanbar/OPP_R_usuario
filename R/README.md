@@ -1,6 +1,10 @@
-# Código R
+# Código R (y otros)
 
-En esta carpeta se guardan múltiples archivos con comandos escritos en lenguaje R (i.e.: "scripts"). Para guardar archivos individuales, siga los siguientes pasos:
+> Las instrucciones también sirven para archivos:
+
+> .R, .txt, .csv, .Rmd, .md y más...
+
+En esta carpeta se guardan múltiples archivos con comandos escritos en lenguaje R (i.e.: "scripts"). Para guardar archivos individuales, siga los siguientes pasos (aplica también para otros archivos de texto plano, como se indica arriba).
 
 1. Ir al enlace del archivo individual (ejemplo: [clase_01.R](clase_01.R)).  
 2. Hacer click en "[Raw](https://raw.githubusercontent.com/jumanbar/OPP_R_usuario/master/R/clase_01.R)", para obtener el código puro.  
