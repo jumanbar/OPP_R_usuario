@@ -3,36 +3,278 @@
 # Autor: Juan Manuel Barreneche Sarasola
 # **************************************
 
-# ADVERTENCIA: la clase contiene apuntes incompletos.
+# Poli ----
+# Ejemplo de clase anterior: polinomio de tercer grado: x^3 - 4x^2  + 2x + 1
+#
+# En ese ejemplo usamos estos dos comandos en repetición, usando las flechas
+# arriba y abajo del teclado, para probar la salida del polinomio para distintos
+# valores de x:
+x <- 2
+x ^ 3 - 4 * x ^ 2 + 2 * x + 1
 
-# Vectores ----
-# Secuencias de elementos de un mismo tipo
+# Ahora voy a aprovechar que en R me permite definir mis propias funciones, de
+# forma que puedo hacer el mismo proceso pero en 1 sólo paso...
+p <- function(x) x ^ 3 - 4 * x ^ 2 + 2 * x + 1
+
+# Y entonces... voilà!
+p(2)
+p(1)
+p(-.5)
+
+# Puede explicar con sus propias palabras qué fue lo que ocurrió aquí? Escriba
+# su explicación aquí:
+
+
+# Fin de la explicación ------------------------------+
+
+# I Vectores atómicos ----
+#
+# Se trata de secuencias de elementos de un mismo tipo. En otros lenguajes se
+# pueden llamar arreglos o listas. En R esos términos tienen otro significado.
+#
+# En R, los vectores son el tipo de dato más simple (un valor único también es
+# técnicamente un vector). La función concatenación es una forma sencilla de
+# armar un vector nuevo:
 x <- c(10, 5, -3)
-x * 2 # vectorización
-# loops sería la alternativa
-x[1]
-x[2:3]
-x[3:2]
-x[4]  #?
-x[-1] #?
 
-x[1] <- 11
-x[c(1, 3)] <- c(10.5, -4)
+# Ahora, qué viene a ser aquello de que es "atómico"? Pues que todos los
+# elementos del vector son del mismo tipo.
+#
+# I.a Tipos y clases ----
+#
+# Qué es un "tipo"? (en inglés: data type)
+#
+# Una forma de extraer esta información es con la función typeof, aunque el
+# resultado nos habla de el modo de almacenamiento en la memoria del objeto...
+# en otras palabras, es jerga informática interna que la mayoría de las veces no
+# usaremos.
+typeof(x) # double = número con decimales
+
+# Por otro lado, también existe la función class, que nos devuelve algo
+# diferente en este caso:
+class(x)
+
+# Los tipos o clases de objeto se pueden evaluar y modificar con ciertas
+# funciones, identificables por los prefijos is. y as.
+#
+# Como ejemplo, escriba estos prefijos (con punto y todo) y observe las
+# sujerencias de autocompletado que muestra RStudio...
+is.double(x)
+is.numeric(x)
+is.atomic(x)
+is.integer(x) # integer = entero
+
+# Observe qué ocurre ahora con estos comandos:
+x <- as.integer(x)
+typeof(x)
+class(x)
+is.double(x)
+is.numeric(x)
+is.atomic(x)
+is.integer(x)
+
+# Las clases de objetos son muy importantes y ya vimos algunos ejemplos que dan
+# pista de por qué:
+#
+# ** La clase/tipo de un objeto determina cómo va a interactuar con el resto del
+#    ecosistema de R **
+
+# Determine cuáles son las clases de los siguientes vectores:
+1:3                 # clase: 
+c(1, 2, 3)          # clase:
+c(1L, 2L, 3L)       # clase:
+c("1", "2", "3")    # clase:
+c(TRUE, FALSE, NA)  # clase:
+NA                  # clase:
+NA_character_       # clase:
+NULL                # clase:
+x > 0               # clase:
+
+# I.b Extraer y modificar elementos ----
+# 
+# Para esta sección, vamos a crear un nuevo x, el cual tendra "nombres":
+x <- c(a = 10, b = 5, c = -3, d = 44)
+names(x)
+
+# Nota: a esta altura de la clase, es necesario recomendar que siempre la
+# configuración de teclado más adecuada para programar es aquella que se
+# corresponde con lo que está impreso en las teclas de nuestro teclado. En otras
+# palabras, si el teclado está diseñado para escribir en español
+# (latinoamerica), configurar el teclado a español (latinoamerica). La razón es
+# que vamos a estar utilizando con frecuencia caracteres "raros", como:
+#
+# [ ] | \ & ^ $ % # @ ! ~ ``
+
+# Utilizando los paréntesis rectos o corchetes podemos extraer o modificar un
+# elemento. Ejemplo:
+x[1]
+x[1] <- 77
+
+# Notar que solamente el segundo comando afectó a x:
+x
+
+# Bien, parece sencillo en este caso... Ahora, experimente con variantes de este
+# formato, incluyendo ejemplos debajo de cada ítem:
+#
+# 1. En vez de usar un único número, usar varios números entre los corchetes.
+ 
+# 2. Usar número(s) negativos
+ 
+# 3. Usar el cero
+ 
+# 4. Usar números con decimales
+ 
+# 5. Usar valores muy grandes
+
+# 6. Usar valores no numéricos
+
+# A continuación pongo muchos ejemplos que, espero, sean ilustrativos de los
+# comportamientos de los corchetes:
+x[0]
+x[2:3]
+x[c(2, 4)]
+x[3:4] <- c(-9, 9); x # Al usar ; estoy ejecutando 2 sentencias en 1 línea
+x[4:2]
+x[4:2] <- 505; x
+x[1:3] <- c(-1, 4); x
+x[6]
+x[6] <- -11; x
+x[-3]
+x[c(-3, 4)]
+x[2.3]
+x[-2.3]
+x["a"]
+x[c("b", "d")] <- c(34, 99); x
 
 names(x)
-names(x) <- c("Caro", "Barato", "Evaluacion")
+names(x) <- c("a", "b", "c", "d", "e", "f"); x
+names(x)[3] <- "z"; x
+
+x[c(TRUE, TRUE, FALSE, FALSE, TRUE, TRUE)]
+x[x > 10]
+x[c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE)] <- rnorm(2); x
+x[x > 10] <- rnorm(2) # Esto da error si hay NA
+
+# Recordar que para trabajar con NA, hay que tener en cuenta ciertas reglas
+# especiales. En particular, considere estos dos vectores lógicos:
+x > 10    # Contiene 1 NA
+is.na(x)  # Este en cambio no tiene ningún NA
+!is.na(x) # Ídem que el anterior, pero invertido (efecto de agregar !)
+
+# Para evitar el problema del NA, una opción es usar el & para combinar dos vectores lógicos y el ! para invertir los valores de is.na(x):
+x[x > 10 & !is.na(x)] <- rnorm(2)
 x
+
+# También es importante tener en cuenta que cuando insertamos un valor que
+# corresponde a otra clase, el resultado puede sorprendernos (y no vamos a
+# recibir mensaje de error):
+x[3] <- "7"; x # Inserto un valor character
 class(x)
-x["Caro"]
 
-x > 4
-class(x > 4)
-x[x > 4]
+# El criterio que sigue R en estas situaciones, parecería ser "no perder
+# información". Veamos otro ejemplo:
+x <- as.integer(x)
+x[3] <- TRUE # Inserto un valor logical
+class(x)
 
-lo <- c(FALSE, TRUE, FALSE)
-x[lo]
+# Por último, no está de más mencionar el doble corchete:
+x[[5]]
 
-length(x)
+# El doble corchete siempre devuelve o modifica un único elemento:
+x[[1:3]]
+
+# Hay algún detalle más que queda sin explorar en estos ejemplos. La ayuda es un
+# buen lugar en donde empezar:
+?Extract
+# o
+?"["
+
+# -------------------------+
+# Nota: TRUE y FALSE se comportan como 1 y cero respectivamente, en operaciones 
+# numéricas (multiplicación, suma, etc...):
+TRUE == 1
+FALSE == 0
+
+# Es por esta razón que es posible hacer un conteo de los valores de x que son
+# mayores que 0, de esta manera:
+sum(x > 0, na.rm = TRUE) # na.rm funciona igual que con la función mean
+# -------------------------+
+
+# I.c Operaciones ----
+#
+# Creamos un nuevo x:
+x <- c(3, -4, 12, NA, -7)
+
+# Las operaciones con vectores son muy simples. Por ejemplo, considere el caso
+# de multiplicar a todos los elementos de x por 2:
+x * 2
+
+# Observación: esta multiplicación es un ejemplo de lo que llamamos
+# vectorización. Es decir, se trata de una operación que se repite elemento por
+# elemento, pero se realiza "tras las cortinas", implícitamente. La alternativa
+# a la vectorización es el caso de la mayoría de los lenguajes de programación
+# tradicionales: el uso de loops o bucles.
+# 
+# El siguiente es un ejemplo ilustrativo.
+# 
+# Con vectorización:
+y1 <- x * 2
+# Sin vectorización:
+y2 <- numeric()
+for (i in 1:length(x)) y2[i] <- x[i] * 2
+
+# Comparemos:
+y1 == y2
+all.equal(y1, y2)
+identical(y1, y2)
+
+# Así como podemos multiplicar, hay varias otras operaciones que se pueden
+# hacer.
+#
+# División:
+x / 5
+
+# Elemento por elemento:
+x + 100:104
+x + 100:105 # Qué ocurre aquí?
+
+# Raíz cuadrada:
+sqrt(x) 
+
+# Qué es NaN?
+
+# Potencia:
+2 ** x
+x ** 2
+
+# Logaritmos
+log(x)
+log2(x)
+log10(x)
+log(x, 9)
+
+# Exponencial
+exp(x) # Conoce esta notación? 2.1e04 = 2.1 * 10 ^ 4
+
+# Sumatoria
+sum(x, na.rm = TRUE)
+
+# Productoria
+prod(x, na.rm = TRUE)
+
+# Promedio, desvío estándar, varianza...
+mean(x, na.rm = TRUE)
+sd(x, na.rm = TRUE)
+var(x, na.rm = TRUE)
+
+# Observación: en los últimos 5 casos se usaron funciones que generan un único
+# número. Llamaremos a eso "agrupación" o funciones resumen (summary function),
+# para diferenciarlas de las funciones que devuelven tantos elementos como tenía
+# el vector original: funciones vectorizadas (vectorized functions).
+#
+# (Es un poco desafortunado que se use el término vectorización aquí también,
+# porque no necesariamente tiene por qué significar lo mismo. De todas formas,
+# es un detalle menor.)
 
 # Matrices ----
 # 
@@ -40,33 +282,59 @@ length(x)
 # 
 # Si los vectores son 1D, las matrices son 2D:
 matrix(0, nrow = 3, ncol = 4)
-
 m <- matrix(0, nrow = 3, ncol = 4)
 class(m)
 is.numeric(m)
 
+# Al igual que los vectores, pueden ser de diferentes tipos, pero todos los
+# elementos tienen que ser del mismo:
 m <- matrix("0", nrow = 3, ncol = 4)
 class(m)
 is.numeric(m)
 is.character(m)
 
+# El uso de los corchetes es muy similar, sólo que ahora se agrega una
+# dimensión, lo cual es representado separando las filas y las columnas con una
+# coma:
+m <- matrix(c(1:6 + 3, 1:6 - 8), ncol = 4)
 m[3, 1]
 m[3, 1] <- 7
 m[1, 2] <- -10
-m[3]
-m[4]
 
+# Ejercicio 1 ----
+#
+# Reproducir la siguiente matriz, utilizando el comando matrix:
+
+#      [,1] [,2] [,3] [,4]
+# [1,]    1    2    3    4
+# [2,]    5    6    7    8
+# [3,]    9   10   11   12
+
+# (Consejo: use la ayuda para aprender más de la función matrix.)
+
+# -----------------------------+
+
+# Observe lo siguiente:
+m[5]
+
+# Cómo determina R qué valor corresponde a m[5]?
+
+# También aparece ahora la opción de elegir filas enteras o columnas enteras:
 m[1,]
+m[,1]
+
+# Debe 
 is.matrix(m)
 is.matrix(m[1,])
-m[,1]
+
+
+
 m[lo,]
 # Notar que dejan de ser "columnas" o "filas"
 
 m[2:3, 3:4]
 
 m[2:3, 3:4] <- matrix(c(5, -5, -5, 5), 2, 2)
-# Desmenuzar este comando...
 
 matrix(c(5, -5, -5, 5), 2, 2)
 
@@ -328,10 +596,10 @@ class(iris2)
 
 tribble(
   ~a, ~b,
-   2, TRUE,
-   3, FALSE,
+  2, TRUE,
+  3, FALSE,
   -1, FALSE,
-   5, TRUE)
+  5, TRUE)
 
 #### 
 #### Qué hace esta función? De qué clase es la salida de la misma?
@@ -402,7 +670,7 @@ table(pqts$versions) %>% barplot()
 
 # Alternativa: guardar fechas como character y luego modificarlas
 pqts2 <- read_csv("datos/paquetes.csv", 
-  col_types = cols(first_release = col_character()))
+                  col_types = cols(first_release = col_character()))
 # De esta forma no se pierde información
 # 
 # Es una alternativa útil cuando arreglar a mano no es una opción (por ejemplo, si la cantidad de mensajes de warning es excesiva). De todas formas, para arreglar la columna de una forma automatizada (o semi), tendremos que adquirir otras habilidades que veremos más adelante.
