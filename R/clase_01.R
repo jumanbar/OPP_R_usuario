@@ -276,7 +276,9 @@ hist(y)
 
 # La sesión de trabajo se modifica cada vez que:
 # 
-# 1. Hacemos una asignación, tal como la siguiente:
+# I.c.1 Objetos ----
+# 
+# 1. Creamos un objeto mediante una asignación, tal como la siguiente:
 impares <- 1:50 * 2 - 1
 impares
 
@@ -288,6 +290,8 @@ load("datos/paquetes.RData")
 ls() # Debería figurar el objeto pqts
 
 # 4. Cargamos paquetes...
+# 
+# I.c.2 Paquetes ----
 #
 # Un paquete es una colección de funciones y datos que extienden o mejoran la
 # funcionalidad de R.
@@ -307,7 +311,7 @@ ls() # Debería figurar el objeto pqts
 require(ggplot2)
 ggplot(pqts, aes(as.Date(first_release), index)) +
   geom_line(size = 1.5, col = "skyblue") +
-  scale_x_date(date_breaks = '2 year', date_labels = '%Y') +
+  scale_x_date(doppate_breaks = '2 year', date_labels = '%Y') +
   scale_y_continuous(breaks = seq(0, 14000, 1000)) +
   xlab("Año") + ylab("") + theme_bw() +
   ggtitle("Número de paquetes de R alguna vez publicados en CRAN", 
@@ -367,7 +371,7 @@ browseURL("https://www.rstudio.com/products/rpackages/devtools/")
 
 # Veremos algún ejemplo más adelante.
 
-### * * Objetos y funciones ----
+# I.c.3 Objetos y funciones ----
 
 # Como ya dijimos, crear objetos y guardarlos con algún nombre (que nos parezca
 # informativo) es útil cuando sabemos que serán usados en el futuro. Veamos
