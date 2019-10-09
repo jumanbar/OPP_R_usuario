@@ -13,7 +13,7 @@ Carpetas:
 
 Si lo desea hacer de todas formas, utilice el botón "Clone or Download":
 
-![](descargar_repo.png)
+![](misc/descargar_repo.png)
 
 # ¿Cómo descargar/actualizar las clases individuales?
 
