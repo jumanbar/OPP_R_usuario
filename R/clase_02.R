@@ -90,6 +90,30 @@ NA_character_       # clase:
 NULL                # clase:
 x > 0               # clase:
 
+# I.a.1 Clases y funciones genéricas ----
+#
+# Qué las clases determinan el comportamiento de R al interactuar con los
+# distintos objetos, ya se dijo. Lo que no mencionamos es cómo funciona esto.
+# Por ejemplo, podemos observar el siguiente hecho, aparentemente inocente: la
+# función print funciona para objetos de distintas clases, sin despeinarse...
+print(x)    # Vector numeric
+print(iris) # data.frame
+
+# Sin embargo tanto los objetos (x e iris) como los resultados (lo que se
+# imprime en la consola) son diferentes en cada caso. El secreto está en que la
+# función print es **genérica** (una minoría de funciones lo son).
+# 
+# Las funciones allí llamadas en verdad engloban a muchas funciones, cada una específica para trabajar con una clase particular de objeto. Para indicar cuál versión de print funciona para una determinada clase, se escribe print.nombre_de_la_clase... Ejemplos:
+print.default(x)
+print.function(x)
+print.data.frame(x)
+
+print.default(iris)
+print.function(iris)
+print.data.frame(iris)
+
+# Note la diferencia en cómo se imprimen los resultados
+
 # I.b Extraer y modificar elementos ----
 # 
 # Para esta sección, vamos a crear un nuevo x, el cual tendra "nombres":
@@ -117,13 +141,13 @@ x
 # formato, incluyendo ejemplos debajo de cada ítem:
 #
 # 1. En vez de usar un único número, usar varios números entre los corchetes.
- 
+
 # 2. Usar número(s) negativos
- 
+
 # 3. Usar el cero
- 
+
 # 4. Usar números con decimales
- 
+
 # 5. Usar valores muy grandes
 
 # 6. Usar valores no numéricos
@@ -146,28 +170,58 @@ x[-2.3]
 x["a"]
 x[c("b", "d")] <- c(34, 99); x
 
+# Volviendo al asunto de los nombres de los vectores, es útil saber que los
+# nombres conforman un vector de clase character, el cual puede ser modificado
+# con una sintaxis muy similar a un vector común. Sólo hay que considerar que el
+# "nombre" del vector es "names(x)":
 names(x)
 names(x) <- c("a", "b", "c", "d", "e", "f"); x
 names(x)[3] <- "z"; x
 
+# El caso de los vectores lógicos es bien interesante: sólo los elementos de x
+# que se corresponden con algún TRUE serán impresos.
 x[c(TRUE, TRUE, FALSE, FALSE, TRUE, TRUE)]
-x[x > 10]
-x[c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE)] <- rnorm(2); x
-x[x > 10] <- rnorm(2) # Esto da error si hay NA
 
-# Recordar que para trabajar con NA, hay que tener en cuenta ciertas reglas
-# especiales. En particular, considere estos dos vectores lógicos:
+# El siguiente ejemplo es una instancia de la aplicación más frecuente del uso
+# de vectores lógicos entre corchetes: el filtrado de valores
+x[x > 10]
+
+# Podemos incluso usar is.na para eliminar los NA contenidos en x:
+x[!is.na(x)]
+
+# Redefinamos x:
+(x <- c(77, -10, 5, 3, NA, -9))
+x[c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE)] <- c(70, 4); x
+x[x > 0] <- c(67, 13, 8) # Esto da error si hay NAs ...
+
+# Cómo solucionar este problema? Para estos casos, los autores de R nos regalan
+# which:
+w <- which(x > 0) # En qué posiciones de x se cumple la condición?
+w                 # Las posiciones 1, 3 y 4
+x[w]              # Uso las posiciones en w para extraer los valores de x
+x[w] <- c(67, 13, 8) # Uso las posiciones en w para modificar los valores de x
+
+# Pregunta: cuál fue el último comando en que se modificaron valores de x?
+
+# El uso de which no es la única alternativa y, aunque para el ejemplo es
+# perfectamente suficiente, es bueno recordar la existencia de is.na. Como habíamos visto antes, usando este truco:
+x[!is.na(x)]
+
+# Podemos extraer todos los elementos de x que no son NA. Compare estos resultados:
 x > 10    # Contiene 1 NA
 is.na(x)  # Este en cambio no tiene ningún NA
 !is.na(x) # Ídem que el anterior, pero invertido (efecto de agregar !)
 
-# Para evitar el problema del NA, una opción es usar el & para combinar dos vectores lógicos y el ! para invertir los valores de is.na(x):
-x[x > 10 & !is.na(x)] <- rnorm(2)
-x
+# Si sólo hubiera una forma de combinar estas salidas?...
+#
+# Por supuesto, la hay: combinar vectores lógicos para invertir los valores de
+# is.na(x). Observemos este resultado:
+x > 10 & !is.na(x)
 
-# Otra opción es usar la función which:
-w <- which(x > 10)
-x[w]
+# Habrá notado que en el resultado no aparece ningún NA. Entonces puedo usar
+# este vector lógico para filtar x, o incluso modificarlo:
+x[x > 10 & !is.na(x)] <- c(88, 15)
+x
 
 # * * Ejercicio 1 ----
 # 
@@ -188,27 +242,37 @@ length(y)
 # (Pista: la sintaxis es similar a la en el ejemplo anterior al which.)
 
 # Si el resultado es correcto, el porcentaje de valores en los extremos debería
-# ser cercano al 5%, por tratarse de una distribución normal estándar.
-# 
-#  ---------------------------+
+# ser cercano al 5%, por tratarse de una distribución normal estándar. Puede 
+# chequear que el resultado es correcto con el comando:
 
-# También es importante tener en cuenta que cuando insertamos un valor que
-# corresponde a otra clase, el resultado puede sorprendernos (y no vamos a
-# recibir mensaje de error):
+length(z) / length(y)
+ 
+# ---------------------------+
+
+# I.b.1 Cambiar de clase "sin querer" ----
+#
+# Es importante tener en cuenta que cuando insertamos un valor que corresponde a
+# otra clase, el resultado puede sorprendernos (y no vamos a recibir mensaje de
+# error):
 x[3] <- "7"; x # Inserto un valor character
 class(x)
+x
 
 # El criterio que sigue R en estas situaciones, parecería ser "no perder
 # información". Veamos otro ejemplo:
 x <- as.integer(x)
 x[3] <- TRUE # Inserto un valor logical
 class(x)
+x # El tercer valor es un 1...
 
 # Por último, no está de más mencionar el doble corchete:
 x[[5]]
 
 # El doble corchete siempre devuelve o modifica un único elemento:
 x[[1:3]]
+
+# Esta propiedad puede ser utilizada para asegurarnos que estamos tomando un
+# único valor, en vez de muchos.
 
 # Hay algún detalle más que queda sin explorar en estos ejemplos. La ayuda es un
 # buen lugar en donde empezar:
@@ -251,9 +315,13 @@ y2 <- numeric()
 for (i in 1:length(x)) y2[i] <- x[i] * 2
 
 # Comparemos:
-y1 == y2
+y1 == y2 # y1 igual a y2 ?
+y1 != y2 # y1 distinto de y2 ?
 all.equal(y1, y2)
 identical(y1, y2)
+
+# Nota: puse estas funciones para mostrar que existen. Queda a criterio del
+# estudiante deducir su uso y consultar la documentación.
 
 # Así como podemos multiplicar, hay varias otras operaciones que se pueden
 # hacer.
@@ -269,6 +337,7 @@ x + 100:105 # Qué ocurre aquí?
 sqrt(x) 
 
 # Qué es NaN?
+?NaN
 
 # Potencia:
 2 ** x
@@ -279,9 +348,10 @@ log(x)
 log2(x)
 log10(x)
 log(x, 9)
+log(0) # Observe este resultado y busque una explicación
 
-# Exponencial
-exp(x) # Conoce esta notación? 2.1e04 = 2.1 * 10 ^ 4
+# Exponencial ("e a la x")
+exp(x)
 
 # Sumatoria
 sum(x, na.rm = TRUE)
@@ -858,7 +928,13 @@ pqts %>%
 # Ejercicio 1
 w <- which(y > 1.96 | y < -1.96)
 z <- y[w]
-length(z) / length(y)
+
+length(z) / length(y) # 0.0468
+
+# Observación: el resultado anterior también se puede obtener con este comando:
+sum(y > 1.96 | y < -1.96) / length(y)
+
+# Puede imaginar por qué es que esto funciona así?
 
 # Ejercicio 2
 matrix(1:5, nrow = 3,  ncol = 4, byrow = TRUE)
