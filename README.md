@@ -6,6 +6,7 @@ Carpetas:
 - [datos](datos/): archivos con datos (texto plano, planillas, RData y más)  
 - [R](R/): archivos de código R  
 - [salidas](salidas): archivos generados desde R (como gráficos o texto)
+- [misc](misc): archivos misceláneos (ej.: capturas de pantalla usados para armar instrucciones)
 
 # ¿Cómo desargar el repositorio completo?
 
