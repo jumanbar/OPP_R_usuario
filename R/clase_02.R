@@ -21,8 +21,12 @@ p(2)
 p(1)
 p(-.5)
 
+# Podemos visualizar el polinomio con la función curve:
+curve(p(x), from = -.5, to = 3.5)
+abline(h = 0, col = "blue")
+
 # Puede explicar con sus propias palabras qué fue lo que ocurrió aquí? Escriba
-# su explicación aquí:
+# su explicación abajo:
 
 
 # Fin de la explicación ------------------------------+
