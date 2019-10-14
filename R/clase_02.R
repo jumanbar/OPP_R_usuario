@@ -15,18 +15,14 @@ x ^ 3 - 4 * x ^ 2 + 2 * x + 1
 # Ahora voy a aprovechar que en R me permite definir mis propias funciones, de
 # forma que puedo hacer el mismo proceso pero en 1 sólo paso...
 p <- function(x) x ^ 3 - 4 * x ^ 2 + 2 * x + 1
-
+p
 # Y entonces... voilà!
 p(2)
 p(1)
 p(-.5)
 
-# Podemos visualizar el polinomio con la función curve:
-curve(p(x), from = -.5, to = 3.5)
-abline(h = 0, col = "blue")
-
 # Puede explicar con sus propias palabras qué fue lo que ocurrió aquí? Escriba
-# su explicación abajo:
+# su explicación aquí:
 
 
 # Fin de la explicación ------------------------------+
@@ -94,29 +90,9 @@ NA_character_       # clase:
 NULL                # clase:
 x > 0               # clase:
 
-# I.a.1 Clases y funciones genéricas ----
-#
-# Qué las clases determinan el comportamiento de R al interactuar con los
-# distintos objetos, ya se dijo. Lo que no mencionamos es cómo funciona esto.
-# Por ejemplo, podemos observar el siguiente hecho, aparentemente inocente: la
-# función print funciona para objetos de distintas clases, sin despeinarse...
-print(x)    # Vector numeric
-print(iris) # data.frame
-
-# Sin embargo tanto los objetos (x e iris) como los resultados (lo que se
-# imprime en la consola) son diferentes en cada caso. El secreto está en que la
-# función print es **genérica** (una minoría de funciones lo son).
-# 
-# Las funciones allí llamadas en verdad engloban a muchas funciones, cada una específica para trabajar con una clase particular de objeto. Para indicar cuál versión de print funciona para una determinada clase, se escribe print.nombre_de_la_clase... Ejemplos:
+print(x)
 print.default(x)
-print.function(x)
 print.data.frame(x)
-
-print.default(iris)
-print.function(iris)
-print.data.frame(iris)
-
-# Note la diferencia en cómo se imprimen los resultados
 
 # I.b Extraer y modificar elementos ----
 # 
@@ -145,13 +121,13 @@ x
 # formato, incluyendo ejemplos debajo de cada ítem:
 #
 # 1. En vez de usar un único número, usar varios números entre los corchetes.
-
+ 
 # 2. Usar número(s) negativos
-
+ 
 # 3. Usar el cero
-
+ 
 # 4. Usar números con decimales
-
+ 
 # 5. Usar valores muy grandes
 
 # 6. Usar valores no numéricos
@@ -174,58 +150,28 @@ x[-2.3]
 x["a"]
 x[c("b", "d")] <- c(34, 99); x
 
-# Volviendo al asunto de los nombres de los vectores, es útil saber que los
-# nombres conforman un vector de clase character, el cual puede ser modificado
-# con una sintaxis muy similar a un vector común. Sólo hay que considerar que el
-# "nombre" del vector es "names(x)":
 names(x)
 names(x) <- c("a", "b", "c", "d", "e", "f"); x
 names(x)[3] <- "z"; x
 
-# El caso de los vectores lógicos es bien interesante: sólo los elementos de x
-# que se corresponden con algún TRUE serán impresos.
 x[c(TRUE, TRUE, FALSE, FALSE, TRUE, TRUE)]
-
-# El siguiente ejemplo es una instancia de la aplicación más frecuente del uso
-# de vectores lógicos entre corchetes: el filtrado de valores
 x[x > 10]
+x[c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE)] <- rnorm(2); x
+x[x > 10] <- rnorm(2) # Esto da error si hay NA
 
-# Podemos incluso usar is.na para eliminar los NA contenidos en x:
-x[!is.na(x)]
-
-# Redefinamos x:
-(x <- c(77, -10, 5, 3, NA, -9))
-x[c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE)] <- c(70, 4); x
-x[x > 0] <- c(67, 13, 8) # Esto da error si hay NAs ...
-
-# Cómo solucionar este problema? Para estos casos, los autores de R nos regalan
-# which:
-w <- which(x > 0) # En qué posiciones de x se cumple la condición?
-w                 # Las posiciones 1, 3 y 4
-x[w]              # Uso las posiciones en w para extraer los valores de x
-x[w] <- c(67, 13, 8) # Uso las posiciones en w para modificar los valores de x
-
-# Pregunta: cuál fue el último comando en que se modificaron valores de x?
-
-# El uso de which no es la única alternativa y, aunque para el ejemplo es
-# perfectamente suficiente, es bueno recordar la existencia de is.na. Como habíamos visto antes, usando este truco:
-x[!is.na(x)]
-
-# Podemos extraer todos los elementos de x que no son NA. Compare estos resultados:
+# Recordar que para trabajar con NA, hay que tener en cuenta ciertas reglas
+# especiales. En particular, considere estos dos vectores lógicos:
 x > 10    # Contiene 1 NA
 is.na(x)  # Este en cambio no tiene ningún NA
 !is.na(x) # Ídem que el anterior, pero invertido (efecto de agregar !)
 
-# Si sólo hubiera una forma de combinar estas salidas?...
-#
-# Por supuesto, la hay: combinar vectores lógicos para invertir los valores de
-# is.na(x). Observemos este resultado:
-x > 10 & !is.na(x)
-
-# Habrá notado que en el resultado no aparece ningún NA. Entonces puedo usar
-# este vector lógico para filtar x, o incluso modificarlo:
-x[x > 10 & !is.na(x)] <- c(88, 15)
+# Para evitar el problema del NA, una opción es usar el & para combinar dos vectores lógicos y el ! para invertir los valores de is.na(x):
+x[x > 10 & !is.na(x)] <- rnorm(2)
 x
+
+# Otra opción es usar la función which:
+w <- which(x > 10)
+x[w]
 
 # * * Ejercicio 1 ----
 # 
@@ -246,37 +192,27 @@ length(y)
 # (Pista: la sintaxis es similar a la en el ejemplo anterior al which.)
 
 # Si el resultado es correcto, el porcentaje de valores en los extremos debería
-# ser cercano al 5%, por tratarse de una distribución normal estándar. Puede 
-# chequear que el resultado es correcto con el comando:
+# ser cercano al 5%, por tratarse de una distribución normal estándar.
+# 
+#  ---------------------------+
 
-length(z) / length(y)
- 
-# ---------------------------+
-
-# I.b.1 Cambiar de clase "sin querer" ----
-#
-# Es importante tener en cuenta que cuando insertamos un valor que corresponde a
-# otra clase, el resultado puede sorprendernos (y no vamos a recibir mensaje de
-# error):
+# También es importante tener en cuenta que cuando insertamos un valor que
+# corresponde a otra clase, el resultado puede sorprendernos (y no vamos a
+# recibir mensaje de error):
 x[3] <- "7"; x # Inserto un valor character
 class(x)
-x
 
 # El criterio que sigue R en estas situaciones, parecería ser "no perder
 # información". Veamos otro ejemplo:
 x <- as.integer(x)
 x[3] <- TRUE # Inserto un valor logical
 class(x)
-x # El tercer valor es un 1...
 
 # Por último, no está de más mencionar el doble corchete:
 x[[5]]
 
 # El doble corchete siempre devuelve o modifica un único elemento:
 x[[1:3]]
-
-# Esta propiedad puede ser utilizada para asegurarnos que estamos tomando un
-# único valor, en vez de muchos.
 
 # Hay algún detalle más que queda sin explorar en estos ejemplos. La ayuda es un
 # buen lugar en donde empezar:
@@ -319,13 +255,9 @@ y2 <- numeric()
 for (i in 1:length(x)) y2[i] <- x[i] * 2
 
 # Comparemos:
-y1 == y2 # y1 igual a y2 ?
-y1 != y2 # y1 distinto de y2 ?
+y1 == y2
 all.equal(y1, y2)
 identical(y1, y2)
-
-# Nota: puse estas funciones para mostrar que existen. Queda a criterio del
-# estudiante deducir su uso y consultar la documentación.
 
 # Así como podemos multiplicar, hay varias otras operaciones que se pueden
 # hacer.
@@ -341,7 +273,6 @@ x + 100:105 # Qué ocurre aquí?
 sqrt(x) 
 
 # Qué es NaN?
-?NaN
 
 # Potencia:
 2 ** x
@@ -352,10 +283,9 @@ log(x)
 log2(x)
 log10(x)
 log(x, 9)
-log(0) # Observe este resultado y busque una explicación
 
-# Exponencial ("e a la x")
-exp(x)
+# Exponencial
+exp(x) # Conoce esta notación? 2.1e04 = 2.1 * 10 ^ 4
 
 # Sumatoria
 sum(x, na.rm = TRUE)
@@ -486,116 +416,12 @@ a <- array(1:24, dim = c(4, 3, 2))
 
 # ----------------------------------------------------+
 
-# III Texto (character) -----
-# 
-# El uso de comillas, simples o dobles, denotan un vector character:
-txt <- c("comillas dobles", 'comillas simples', 
-         "comillas simples 'adentro' de comillas dobles")
-
-# Funciones de gran utilidad para trabajar con texto son: paste, substr,
-# strsplit, grep y gsub...
-# 
-# Aquí veremos ejemplos de algunas de ellas.
-# 
-# Ver más en: cheatsheet de strings.R o
-?character
-
-# III.a grep y sub ----
-#
-# Es un grupo de funciones que trabaja con expresiones regulares. Las
-# expresiones regulares son herramientas muy poderosas que sirven para detectar
-# patrones en cadenas de caracteres.
-grep("comillas", txt)
-grep("simples", txt)
-grep("dobles", txt)
-grep("dobles", txt, value = TRUE)
-grep("dobles", txt, value = TRUE, invert = TRUE)
-grepl("dobles", txt)
-!grepl("dobles", txt)
-
-# En particular, estos ultimos dos ejemplos son muy útiles para utilizar con
-# tablas de datos, ya que nos permiten hacer un filitrado de filas según alguna
-# columna de texto.
-
-# En estos ejemplos estamos usando patrones súper simples. Veamos uno un poco
-# más abstracto:
-txt <- c("alvin87", "dOnatellO", "jammq98", "oli_007", "trUerealm")
-grep("[0-9]", txt) # Tienen dígitos
-grep("[ou]", txt, ignore.case = TRUE)  # Tienen O o U
-grep("^[aeiou]", txt, ignore.case = TRUE)  # empiezan con vocal
-grep("^[aeiou].*[aeiou]$", txt, ignore.case = TRUE) # empiezan o terminan con vocal
-
-# Para profundizar:
-?grep
-?regex
-
-# Un par de ejemplitos con gsub:
-gsub("O", "o", txt) # Todas las o en minúsculas
-gsub("[0-9_]+", "", txt) # Eliminar números y guiones bajos
-
-# III.b paste (y paste0) ----
-#
-# Sirven para pegar textos... paste0 es idéntico a paste, excepto que el
-# argumento sep = "". Algunos ejemplos ilustrativos:
-paste(1:5, ". ", txt)
-paste(1:5, ". ", txt, sep = "")
-paste(1:5, ". ", txt, sep = "", collapse = "; ")
-
-# Los caracteres especiales \t y \n
-txt2 <- paste(1:5, "\t", txt, sep = "", collapse = "\n")
-cat(txt2)
-
-# Qué interpreta usted de este resultado?
-
-# * * Ejercicio 3 ----
-# 
-# Cocos, duraznos y mangos
-# 
-# Considere el siguiente vector:
-frutas <- sample(c("coco", "durazno", "mango"), size = 21, replace = TRUE)
-frutas # Una muestra aleatoria de frutas
-# 
-# 3.a:
-# 
-# Busque la manera de usar la función paste o paste0 y, sin saber exactamente
-# cuántas veces se repite cada valor, generar un vector similar al siguiente:
-ej<- c("Tengo unos 100 cocos", 
-       "Tengo unos 99 duraznos", 
-       "Tengo unos 50 mangos")
-
-# (La idea es que la solución debe servir para cualquier vector de frutas.)
-
-# Para esto es clave usar la función table (y la función names):
-cuantas.frutas <- table(frutas)
-cuantas.frutas
-names(cuantas.frutas)
-
-# Respuesta:
-
-# - - - - -
-# 3.b:
-#
-# Cambiar el resultado final: un único texto con la frase:
-# 
-# "Tengo unos 100 cocos, 99 duraznos y 50 mangos"
-#
-# En esta ocasión puede ser útil el argumento collapse, de la función paste o
-# paste0.
-# 
-# Respuesta:
-
-# -----------------------------+
-
-
-# Qué hizo esta función? La pongo aquí porque es bastánte útil en general (ver 
-# ?paste).
-
-# IV Lógicos ----
+# III Lógicos ----
 # 
 # También llamados booleanos
 # 
 # Vectores cuyos valores son TRUE o FALSE
-# 
+set.seed(0)
 x <- rpois(15, 4); x
 x > 4
 x >= 4
@@ -609,13 +435,14 @@ sum(logico)
 # Ya vimos que los vectores lógicos sirven para filtrar elementos de un
 # vector... esto es de gran utilidad para trabajar con tablas.
 
-# Es interesante poder combinar los operadores lógicos
+# Vimos también que es de utilidad poder combinar los operadores lógicos
 x > 5 | x <= 3 # Esto es un OR
 x > 5 & x <= 3 # Esto es un AND (por qué son todos falsos?)
 x < 5 & x >= 3 # Complemento del primer ejemplo
 x > 3 & x < 7 | x == 2 # Se pueden seguir combinando expresiones...
+x > 3 & (x < 7 | x == 2) # Atención a los paréntesis (pero no abusar de ellos!)
 
-# En el caso de && y ||, las reglas son las misas, pero se restringen a
+# En el caso de && y ||, las reglas son las mismas, pero se restringen a
 # comparaciones de 1 a 1:
 x[1] < 4 && x[6] > 5
 x[1] < 4 || x[6] > 5
@@ -634,14 +461,222 @@ xor(x >= 4, x <= 6)
 # F | T |   F     |   T    |  T  |     T
 # F | F |   F     |   F    |  F  |     T
 
-# * Factores ----
+# Luego hay otras funciones y operadores para trabajar con vectores enteros:
+
+# El operador %in% funciona como múltiples OR:
+x <- c("coco", "damasco"); y <- c("coco", "mango", "durazno")
+x %in% y
+# Equivale a:
+x == y[1] | x == y[2] | x == y[3]
+
+# No es lo mismo A %in% B que B %in% A (ie.: operación *no* conmutativa):
+y %in% x
+x[x %in% y]
+x[y %in% x] # Qué ocurre aquí?
+
+# Otras funciones prácticas son all y any. 
+# all evalua si todos los valores son TRUE (ie.: es un AND grupal):
+x <- 4:8; y <- c(3, -1, 4, 2, 6)
+all(x %in% y)
+all(x > y)
+
+# any evalua si al al menos un TRUE en el conjunto (ie.: OR grupal):
+any(x %in% y)
+any(x <= y)
+
+# * * Ejercicio 3 ----
+#
+# Una recodificación sencilla.
+#
+# Considere el vector dpto, que contiene los nombres de departamentos de
+# Uruguay. El objetivo es crear un vector llamado zona, el cual tendrá 19
+# valores y cada uno indicará la zona a la que pertenece el departamento.
+# Empezaremos por el caso más simple e iremos complejizando gradualmente el
+# problema.
+dpto <- c("Montevideo", "Artigas", "Canelones", "Cerro Largo", "Colonia", 
+          "Durazno", "Flores", "Florida", "Lavalleja", "Maldonado", "Paysandú", 
+          "Río Negro", "Rivera", "Rocha", "Salto", "San José", "Soriano", 
+          "Tacuarembó", "Treinta y Tres")
+zona <- character(19)
+
+# 3.a:
 # 
-# Secuencias de valores que expresan variables categóricas, muy al estilo tratamientos de un experimento controlado.
+# Empecemos con dos zonas.
+# 
+# A: Montevideo
+# 
+# B: Resto del país
+# 
+# Respuesta:
+
+# Nota: la función ifelse es conveniente para estos casos.
+# -------------+
+
+# 3.b: 
+# 
+# Cambiamos un poco la clasificación:
+# 
+# A: Montevideo
+# 
+# B: Colonia, San José, Canelones, Maldonado, Rocha
+#
+# C: Resto del país
+# 
+# (Consejo: %in%)
+# Respuesta:
+
+# Nota: la función case_when, del paquete dplyr, puede ser una herramienta muy
+# práctica para recodificaciones complejas.
+# --------------------+
+
+# 3.b
+#
+# Además de las zonas ya definidas, queremos incorporar la variable basalto a la
+# equcación:
+library(dplyr)
+basalto <- c(0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 2, 1, 2, 0, 2, 0, 0, 2, 0)
+
+# La clasificación final quedaría así:
+# 
+# A: Montevideo
+# 
+# B: Colonia, San José, Canelones, Maldonado, Rocha
+#
+# C: Departamentos en que el basalto es >= 1
+#
+# D: Resto del país
+# 
+# Respuesta:
+
+# Nota: acá también es muy útil case_when...
+# -----------+
+
+# Extra:
+tabla <- data.frame(dpto, basalto, zona)
+
+# IV Texto (character) -----
+# 
+# El uso de comillas, simples o dobles, denotan un vector character:
+txt <- c("comillas dobles", 'comillas simples', 
+         "comillas simples 'adentro' de comillas dobles")
+
+# Funciones de gran utilidad para trabajar con texto son: paste, substr,
+# strsplit, grep y gsub...
+# 
+# Aquí veremos ejemplos de algunas de ellas.
+# 
+# Ver más en: cheatsheet de strings.R o
+?character
+
+# IV.a grep y sub ----
+#
+# Es un grupo de funciones que trabaja con expresiones regulares. Las
+# expresiones regulares son herramientas muy poderosas que sirven para detectar
+# patrones en cadenas de caracteres.
+
+txt <- c("Aaa", "Aab", "bbc", "BBC", "ccd", "acd", "aa1", "dec")
+
+grep("a", txt)
+grep("b", txt)
+grep("bc", txt)
+grep("bc", txt, ignore.case = TRUE)
+grep("c", txt, ignore.case = TRUE, value = TRUE)
+grep("c", txt, ignore.case = TRUE, value = TRUE, invert = TRUE)
+grepl("c", txt, ignore.case = TRUE)
+!grepl("c", txt, ignore.case = TRUE)
+
+# En particular, estos ultimos dos ejemplos son muy útiles para utilizar con
+# tablas de datos, ya que nos permiten hacer un filitrado de filas según alguna
+# columna de texto.
+
+# En estos ejemplos estamos usando patrones súper simples. Veamos uno un poco
+# más abstracto:
+txt <- c("alvin87i", "dOn4tell0", "Oli_007e", "jamN98", "ATrueRealm")
+grep("[0-9]", txt) # Tienen dígitos
+grep("[ou]", txt, ignore.case = TRUE)  # Tienen O o U
+grep("n[0-9]", txt, ignore.case = TRUE) # n seguida de un número
+grep("^[aeiou]", txt, ignore.case = TRUE)  # empiezan con vocal
+grep("[0-9]$", txt) # Termina en un dígito
+grep("^[aeiou].*[aeiou]$", txt, ignore.case = TRUE)
+# empiezan o terminan con vocal
+
+# Para profundizar:
+?grep
+?regex
+
+# Un par de ejemplitos con gsub:
+gsub("O", "o", txt) # Todas las o en minúsculas
+gsub("[0-9_]+", "", txt) # Eliminar números y guiones bajos
+
+# IV.b paste (y paste0) ----
+#
+# Sirven para pegar textos... paste0 es idéntico a paste, excepto que el
+# argumento sep = "". Algunos ejemplos ilustrativos:
+paste(1:5, ". ", txt)
+paste(1:5, ". ", txt, sep = "")
+paste(1:5, ". ", txt, sep = "", collapse = "; ")
+
+# Los caracteres especiales \t y \n
+txt2 <- paste(1:5, "\t", txt, sep = "", collapse = "\n")
+cat(txt2)
+
+# Qué interpreta usted de este resultado?
+
+# * * Ejercicio 4 ----
+# 
+# Cocos, duraznos y mangos
+# 
+# Considere el siguiente vector:
+frutas <- sample(c("coco", "durazno", "mango"), size = 21, replace = TRUE)
+frutas # Una muestra aleatoria de frutas
+# Considere además las funciones table y names (la segunda aplicada a la salida
+# de table):
+cuantas.frutas <- table(frutas)
+cuantas.frutas # Esta es la salida de table
+names(cuantas.frutas)
+
+# 4.a:
+#
+# Escriba código en R (usando paste o paste0) que permita generar un vector
+# similar al siguiente, aún si no sabemos de antemano cuántas veces se repite
+# cada fruto:
+ej <- c("Tengo unos 100 cocos", 
+        "Tengo unos 99 duraznos", 
+        "Tengo unos 50 mangos")
+
+# Respuesta:
+
+# - - - - -
+# 4.b:
+#
+# Cambiar el resultado final a un único texto con la frase:
+# 
+# "Tengo unos 100 cocos, 99 duraznos y 50 mangos"
+#
+# Considere utilizar el argumento collapse, de la función paste o paste0:
+# 
+# Respuesta:
+
+# -----------------------------+
+
+
+# * Factores ----
+#
+# Secuencias de valores que expresan variables categóricas, muy al estilo
+# tratamientos de un experimento controlado.
 f <- factor(x = c(4, 1, 1, 1, 2, 2, 1, 4, 3, 1, 1, 2, 2, 3, 1, 2), 
             labels = c("primaria", "secundaria", "terciaria", "posgrado"))
 f
+as.ordered(f)
+f[1]
+f[f == "primaria"]
 
 # Los factores no son character, y esto es importante recordar.
+#
+# Las funciones de importar tablas de datos tradicionales (read.table,
+# read.csv), convierten cualquier columna del tipo texto a factor... Esto puede
+# y muchas veces genera, confusiones innecesarias (ver: argumento
+# stringsAsFactors en read.table).
 
 # * Fecha y hora ----
 # 
@@ -665,61 +700,67 @@ ymd_hm("2019-09-04 08:59")
 ?ymd
 
 # * Listas ----
-m <- matrix(0, 3, 4)
-m[c(3, 4, 8, 9, 11, 12)] <- 
-  c(7, -10, 5, -5, -5, 5)
-( propios <- eigen(m[,-4]) )
 
-?eigen
+# Las listas son el otro tipo de vector que existe en R. En el vector atómico
+# todos los elementos son de la misma clase, pero en las listas, cada elemento
+# tiene libertad de ser de clase o tipo diferente al resto.
+x <- list(numerosNormales = rnorm(10), matriz = matrix(1:20, 4), "Salamín")
+x
 
-# El objeto propios es una lista (tipo S3). Se pueden ver las entrañas de varias maneras:
+# Observación: los primeros dos elementos se imprimen bajo el nombre, con una $
+# antes, pero el tercer elemento sólo tiene un [[3]] antes de los valores.
 
-class(propios)
-is.list(propios)
+x[[1]]
+x$numerosNormales
+x$matriz
 
-propios[1]
-propios[[1]]
-propios[[2]]
+# Observación 2: evalúe las siguientes salidas:
+x[[3]] # clase :
+x[3]   # clase :
 
-class(propios[1])
-class(propios[[1]]) # Números complejos
-class(propios[[2]])
+# Experimente con estos comandos:
+x[[1:2]]
+x[[-3]]
+x[-3]
+x[[4]] <- summary(x$numerosNormales)
+x$x <- x
+x[[6]] <- x$x
 
-propios[[1]][2:3]
+# Imprimir x para ver el maravilloso entrevero que hemos creado:
+x
+str(x)
+names(x)
+summary(x) # Habla de Class y Mode
+sapply(x, class)
 
-# El operador "$"
-?"$"
+# Nota: recordar que con las comillas podemos acceder a la ayuda de "símbolos":
+?"["
+?"%in%"
+# etc...
 
-propios$values
-
-propios$vectors
-
-unlist(propios)
-
-nueva_lista <- list(a = rnorm(2), b = matrix(c(1, 0, 0, 1), 2, 2))
-
-nueva_lista$c <- ymd("2001-01-01")
-
-nueva_lista[[4]] <- "Texto aleatorio"
-
-names(nueva_lista)
-
-names(nueva_lista)[4] <- "desc"
 
 # * * Regresión lineal ----
 # 
 # Un ejemplo clásico de lista...
+x <- runif(30, 0, 40)
+y <- 11 + x * 1.4 + rnorm(length(x), sd = 15)
 
-example(lm)
+modelo <- lm(y ~ x)
+modelo
+class(modelo)
+summary(modelo)
+str(modelo)
+names(modelo)
 
-lm.D9
-str(lm.D9)
-names(lm.D9)
+modelo$coefficients
 
-lm.D9$coefficients
+plot(modelo$residuals ~ x)
 
-lm.D9[1]
-lm.D9[[1]]
+plot(x, y)
+plot(y ~ x)
+abline(modelo, col = "red")
+
+plot(modelo)
 
 # Tablas -----
 
@@ -784,6 +825,36 @@ is.character(x)
 #### 
 
 # Importar datos ----
+
+# En R y otros lenguajes, la forma clásica de importar y exportar datos es el
+# uso de archivos de texto plano (.txt, .csv, .dat, .tsv...).
+
+# La función elemental de importar datos es read.table. Típicamente un comando
+# de importación requiere algunas especificaciones (ver los argumentos que usa
+# aquí):
+hog <- read.table("datos/ECH2018/H_2018_Terceros.dat", 
+                  sep = "\t",
+                  header = TRUE, 
+                  stringsAsFactors = FALSE)
+
+# Por suerte R viene con algunas funciones que son llamadas "wrappers", que en
+# verdad es la misma, pero con algunas opciones predefinidas. Un ejemplo es
+# read.delim:
+hog <- read.delim('datos/ECH2018/H_2018_Terceros.dat')
+
+# Aunque tiene este comportamiento que es más bien controversial:
+class(hog$nomdpto)
+
+# Hoy en día hay varias herramientas más sofisticadas para importar datos y se
+# integran amablemente a la interfaz de RStudio...
+#
+# Mini ejercicio: pruebe importar la tabla hogares desde la interfaz de RStudio (import dataset). Compare las funciones:
+# 
+# - read_delim: para importar el archivo H_2018_Terceros.dat
+# 
+# - read_sav: para importar el archivo H_2018_TERCEROS.sav
+
+# Inspeccione las salidas y compare las diferencias.
 
 # En el botón import dataset tendremos muchas opciones, que van a depender de qué paquetes están instalados en el sistema...
 # En mi PC tengo la opción del readr que es un paquete bastante bueno, así que lo voy a usar:
@@ -932,22 +1003,70 @@ pqts %>%
 # Ejercicio 1
 w <- which(y > 1.96 | y < -1.96)
 z <- y[w]
-
-length(z) / length(y) # 0.0468
-
-# Observación: el resultado anterior también se puede obtener con este comando:
-sum(y > 1.96 | y < -1.96) / length(y)
-
-# Puede imaginar por qué es que esto funciona así?
+length(z) / length(y)
 
 # Ejercicio 2
 matrix(1:5, nrow = 3,  ncol = 4, byrow = TRUE)
 
 # Ejercicio 3
+# 
 # 3.a:
+dpto <- c("Montevideo", "Artigas", "Canelones", "Cerro Largo", "Colonia",
+          "Durazno", "Flores", "Florida", "Lavalleja", "Maldonado", "Paysandú",
+          "Río Negro", "Rivera", "Rocha", "Salto", "San José", "Soriano", 
+          "Tacuarembó", "Treinta y Tres")
+
+# Opción 1:
+zona <- character(19)
+zona[dpto == "Montevideo"]  <- "A"
+zona[dpto != "Montevideo"] <- "B"
+
+# Alternativamente:
+zona <- ifelse(dpto == "Montevideo", "A", "B")
+
+
+# 3.b: 
+#
+# Opción 1:
+zona <- rep.int("C", 19)
+zona[dpto == "Montevideo"]  <- "A"
+deptosCosteros <- c("Colonia", "San José", "Canelones", "Maldonado", "Rocha")
+zona[dpto %in% deptosCosteros] <- "B"
+
+# Alternativamente:
+deptosCosteros <- c("Colonia", "San José", "Canelones", "Maldonado", "Rocha")
+zona <- case_when(
+  dpto == "Montevideo" ~ "A",
+  dpto %in% deptosCosteros ~ "B",
+  TRUE ~ "C"
+)
+
+# 3.c:
+zona <- rep.int("D", 19)
+zona[dpto == "Montevideo"]  <- "A"
+deptosCosteros <- c("Colonia", "San José", "Canelones", "Maldonado", "Rocha")
+zona[dpto %in% deptosCosteros] <- "B"
+zona[basalto >= 1] <- "C"
+
+# Alternativamente:
+deptosCosteros <- c("Colonia", "San José", "Canelones", "Maldonado", "Rocha")
+zona <- case_when(
+  dpto == "Montevideo" ~ "A",
+  dpto %in% deptosCosteros ~ "B",
+  basalto >= 1 ~ "C",
+  TRUE ~ "D"
+)
+
+# Tablas:
+tabla <- tibble(dpto = dpto, basalto = basalto, zona = zona)
+tabla
+
+# Ejercicio 4
+# 
+# 4.a:
 paste0("Tengo unos ", cuantas.frutas, " ", names(cuantas.frutas), "s")
 
-# 3.b
+# 4.b
 t1 <- paste0(cuantas.frutas, " ", names(cuantas.frutas), "s")
 t2 <- paste0(t1[-length(t1)], collapse = ", ")
 paste0("Tengo unos ", t2, " y ", t1[length(t1)])
