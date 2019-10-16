@@ -121,13 +121,13 @@ x
 # formato, incluyendo ejemplos debajo de cada ítem:
 #
 # 1. En vez de usar un único número, usar varios números entre los corchetes.
- 
+
 # 2. Usar número(s) negativos
- 
+
 # 3. Usar el cero
- 
+
 # 4. Usar números con decimales
- 
+
 # 5. Usar valores muy grandes
 
 # 6. Usar valores no numéricos
@@ -348,9 +348,13 @@ m
 
 # (Consejo: use la ayuda para aprender más de la función matrix.)
 
+
 # -----------------------------+
 
+
 # Observe lo siguiente:
+m <- matrix(-2:2, nrow = 3, ncol = 4)
+
 m[5]
 m[3:8]
 
@@ -367,18 +371,30 @@ is.matrix(m[1,])
 dim(m[,1])
 
 # Para evitar esto, se puede usar el argumento drop (ver ?Extract):
-m[, 1, drop = FALSE]
+
+m[, 1, drop = FALSE] # Única columna
+m[1, , drop = FALSE] # Única fila
 
 # Las reglas generales de los corchetes se siguen cumpliendo, incluyendo el uso
 # de vectores lógicos:
 m[c(FALSE, TRUE, TRUE),]
 
 # Para matrices también sirve la función which, pero con el agregado del
-# argumento arr.ind:
-w <- which(m >= 0, arr.ind = TRUE)
-w
-is.matrix(w)
-m[w] # Es vector atómico
+# argumento arr.ind. Los siguientes ejemplos buscan ilustrar la diferencia entre
+# usar o no usar arr.ind:
+w1 <- which(m >= 0, arr.ind = TRUE)
+w2 <- which(m >= 0) # Por defecto: arr.ind = FALSE
+w1
+w2
+is.matrix(w1)
+is.matrix(w2)
+
+# Claramente los resultados w1 y w2 son diferentes. Sin embargo estos dos
+# comandos devuelven lo mismo:
+m[w1]
+m[w2]
+
+m[5]
 
 # * Nombres ----
 #
@@ -390,7 +406,8 @@ rownames(m)
 rownames(m) <- c("a", "b", "c")
 colnames(m) <- c("w", "x", "y", "z")
 m
-m["b", , drop = FALSE] # Vea como mantiene los nombres. Qué pasa si drop = TRUE?
+m["b", , drop = FALSE] # Obs.: mantiene los nombres.
+m["b", , drop =  TRUE] # Obs.: mantiene los nombres... de las columnas
 
 # * Operaciones ----
 #
@@ -400,11 +417,10 @@ m * -1
 t(m) # Transpuesta
 sum(m)
 mean(m, na.rm = TRUE)
-colMeans(m)
-rowSums(m)
+colMeans(m) # Mantiene nombres de columnas
+rowSums(m)  # Mantiene nombres de filas
 
-# R también incluye la multiplicación entre matrices:
-m[10] <- 12
+# R también incluye la permite la multiplicación matricial, pero debe hacerse con un operadore especial: %*%
 m %*% t(m)
 ?"%*%"
 
@@ -412,7 +428,21 @@ m %*% t(m)
 # 
 # Así como pasar de vectores atómicos a matrices es cuestión de agregar una dimensión más, pasar de matrices a arrays ("arreglos"), es como saltar del 2D al 3D, o el 4D... o el nD
 ?array
+
+# Veamos un ejemplo con 3 dimensiones:
 a <- array(1:24, dim = c(4, 3, 2))
+
+# 4 Filas
+# 3 Columnas
+# 2 "Pisos"
+a
+
+# El uso de corchetes sigue un criterio coherente. El orden en que se indican
+# las posiciones es el mismo con el que se definen las dimensiones (ver arguento
+# dim de array):
+a[2, 3, 2]
+a[2, 3, 2:1]
+a[2, 2:3, 2:1]
 
 # ----------------------------------------------------+
 
@@ -422,11 +452,12 @@ a <- array(1:24, dim = c(4, 3, 2))
 # 
 # Vectores cuyos valores son TRUE o FALSE
 set.seed(0)
-x <- rpois(15, 4); x
+x <- rpois(15, 4); x # rpois: valores aleatorios con dist. Poisson lambda = 4
 x > 4
 x >= 4
+x != 7
 x < 2
-logico <- x == 4; logico
+logico <- x == 4; logico # Con ; se pueden ejecutar 2 comandos en la misma línea
 logico + 1
 logico * -5
 sum(logico)
@@ -443,9 +474,21 @@ x > 3 & x < 7 | x == 2 # Se pueden seguir combinando expresiones...
 x > 3 & (x < 7 | x == 2) # Atención a los paréntesis (pero no abusar de ellos!)
 
 # En el caso de && y ||, las reglas son las mismas, pero se restringen a
-# comparaciones de 1 a 1:
-x[1] < 4 && x[6] > 5
-x[1] < 4 || x[6] > 5
+# comparaciones entre vectores de 1 elemento:
+x > 3  # 8 TRUE
+x <= 5 # 5 TRUE
+x > 3 &  x <= 5 # 4 TRUE
+x > 3 |  x <= 5 # 15 TRUE
+# Observar: que el resultado siempre, hasta ahora, son vectores lógicos de 15
+# elementos.
+
+# Ahora en cambio se obtienen resultados de 1 sólo elemento:
+x > 3 && x <= 5 # FALSE
+x > 3 || x <= 5 # TRUE
+
+# En estos casos R descarta todos los elementos excepto el primero. Es decir, los comandos anteriores son equivalentes a:
+x[1] > 3 & x[1] <= 5
+x[1] > 3 | x[1] <= 5
 
 # También existe el OR exclusivo:
 xor(x >= 4, x <= 6)
@@ -464,7 +507,8 @@ xor(x >= 4, x <= 6)
 # Luego hay otras funciones y operadores para trabajar con vectores enteros:
 
 # El operador %in% funciona como múltiples OR:
-x <- c("coco", "damasco"); y <- c("coco", "mango", "durazno")
+x <- c("coco", "damasco")
+y <- c("coco", "mango", "durazno")
 x %in% y
 # Equivale a:
 x == y[1] | x == y[2] | x == y[3]
@@ -474,13 +518,24 @@ y %in% x
 x[x %in% y]
 x[y %in% x] # Qué ocurre aquí?
 
+# Ahora, si cambio el orden de las frutas:
+x[y[c(2, 3, 1)] %in% x]
+# El anterior comando sería equivalente a:
+x[3]
+
 # Otras funciones prácticas son all y any. 
 # all evalua si todos los valores son TRUE (ie.: es un AND grupal):
 x <- 4:8; y <- c(3, -1, 4, 2, 6)
 all(x %in% y)
 all(x > y)
+# Era este el resultado que esperaba? Acaso no hay algunos y que son mayores que
+# algunos x?
 
-# any evalua si al al menos un TRUE en el conjunto (ie.: OR grupal):
+# La siguiente tablita nos ayuda a entender lo que ocurre:
+data.frame(x, y, x_mayor_y = x > y)
+# La clave es que x > y compara los valores según las posiciones (1 a 1)
+
+# any evalua si al menos un TRUE en el conjunto (ie.: OR grupal):
 any(x %in% y)
 any(x <= y)
 
@@ -524,17 +579,28 @@ zona <- character(19)
 # 
 # (Consejo: %in%)
 # Respuesta:
+costa <- c("Colonia", "San José",
+           "Canelones", "Maldonado", 
+           "Rocha")
 
+zona <- case_when(
+  dpto == "Montevideo" ~ "A",
+  dpto %in% costa ~ "B",
+  TRUE ~ "C"
+)
+
+table(zona)
 # Nota: la función case_when, del paquete dplyr, puede ser una herramienta muy
 # práctica para recodificaciones complejas.
 # --------------------+
 
-# 3.b
+# 3.c:
 #
 # Además de las zonas ya definidas, queremos incorporar la variable basalto a la
 # equcación:
 library(dplyr)
-basalto <- c(0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 2, 1, 2, 0, 2, 0, 0, 2, 0)
+basalto <- c(0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
+             2, 1, 2, 0, 2, 0, 0, 2, 0)
 
 # La clasificación final quedaría así:
 # 
@@ -550,6 +616,8 @@ basalto <- c(0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 2, 1, 2, 0, 2, 0, 0, 2, 0)
 
 # Nota: acá también es muy útil case_when...
 # -----------+
+
+table(zona) -> x
 
 # Extra:
 tabla <- data.frame(dpto, basalto, zona)
@@ -592,6 +660,7 @@ grepl("c", txt, ignore.case = TRUE)
 # En estos ejemplos estamos usando patrones súper simples. Veamos uno un poco
 # más abstracto:
 txt <- c("alvin87i", "dOn4tell0", "Oli_007e", "jamN98", "ATrueRealm")
+
 grep("[0-9]", txt) # Tienen dígitos
 grep("[ou]", txt, ignore.case = TRUE)  # Tienen O o U
 grep("n[0-9]", txt, ignore.case = TRUE) # n seguida de un número
@@ -600,13 +669,18 @@ grep("[0-9]$", txt) # Termina en un dígito
 grep("^[aeiou].*[aeiou]$", txt, ignore.case = TRUE)
 # empiezan o terminan con vocal
 
+grepl("^[aeiou].*[aeiou]$", "a452394fjghh7", ignore.case = TRUE)
+
 # Para profundizar:
 ?grep
 ?regex
 
 # Un par de ejemplitos con gsub:
 gsub("O", "o", txt) # Todas las o en minúsculas
+gsub("\\.", ",", "85,453")
 gsub("[0-9_]+", "", txt) # Eliminar números y guiones bajos
+
+dir(pattern = "\\.txt$")
 
 # IV.b paste (y paste0) ----
 #
@@ -618,6 +692,8 @@ paste(1:5, ". ", txt, sep = "", collapse = "; ")
 
 # Los caracteres especiales \t y \n
 txt2 <- paste(1:5, "\t", txt, sep = "", collapse = "\n")
+txt2
+print(txt2)
 cat(txt2)
 
 # Qué interpreta usted de este resultado?
@@ -627,13 +703,15 @@ cat(txt2)
 # Cocos, duraznos y mangos
 # 
 # Considere el siguiente vector:
-frutas <- sample(c("coco", "durazno", "mango"), size = 21, replace = TRUE)
+frutas <- sample(c("coco", "durazno", "mango"), size = 21, 
+                 replace = TRUE)
 frutas # Una muestra aleatoria de frutas
 # Considere además las funciones table y names (la segunda aplicada a la salida
 # de table):
 cuantas.frutas <- table(frutas)
 cuantas.frutas # Esta es la salida de table
 names(cuantas.frutas)
+cuantas.frutas["coco"]
 
 # 4.a:
 #
@@ -770,30 +848,32 @@ plot(modelo)
 class(iris)
 dim(iris)
 
+library(lubridate)
 set.seed(0)
 midf <- data.frame(
-  nivel_educativo = f,
+  nivel_educativo = c("primaria", "secundaria", "terciaria", "posgrado"),
   fecha_egreso = ymd(paste0("2009-10", rpois(16, 15))),
-  nota = rnorm(length(f), mean = 60, sd = 17)
+  nota = rnorm(16, mean = 60, sd = 17)
 )
 
 midf
 head(midf)
-midf[1:3,]
-midf[1:3]
+midf[1:2,]
+midf[1:2]
 
-midf$nota # Las data.frames son listas...
-class(midf$nota)
+midf$nivel_educativo # Las data.frames son listas...
+class(midf$nivel_educativo)
 
 lm(nota ~ nivel_educativo, data = midf)
 plot(nota ~ nivel_educativo, data = midf)
 
 library(ggplot2)
-ggplot(midf) +
-  aes(x = nivel_educativo, y = nota) +
-  # geom_point() +
-  # geom_jitter()
-  geom_boxplot()
+p <- ggplot(midf) + aes(x = nivel_educativo, y = nota)
+p + geom_point() + geom_jitter()
+p + geom_boxplot()
+
+p <- ggplot(midf) + aes(x = fecha_egreso, y = nota, col = nivel_educativo)
+p + geom_point()
 
 # - tibble: una versión de las tablas que propone el paquete tibble (tidyverse).
 library(tibble)
@@ -817,12 +897,6 @@ tribble(
   -1, FALSE,
   5, TRUE)
 
-#### 
-#### Qué hace esta función? De qué clase es la salida de la misma?
-is.numeric(x)
-is.character(x)
-#### 
-#### 
 
 # Importar datos ----
 
@@ -831,59 +905,101 @@ is.character(x)
 
 # La función elemental de importar datos es read.table. Típicamente un comando
 # de importación requiere algunas especificaciones (ver los argumentos que usa
-# aquí):
-hog <- read.table("datos/ECH2018/H_2018_Terceros.dat", 
-                  sep = "\t",
-                  header = TRUE, 
-                  stringsAsFactors = FALSE)
-
-# Por suerte R viene con algunas funciones que son llamadas "wrappers", que en
-# verdad es la misma, pero con algunas opciones predefinidas. Un ejemplo es
-# read.delim:
-hog <- read.delim('datos/ECH2018/H_2018_Terceros.dat')
-
-# Aunque tiene este comportamiento que es más bien controversial:
-class(hog$nomdpto)
-
-# Hoy en día hay varias herramientas más sofisticadas para importar datos y se
-# integran amablemente a la interfaz de RStudio...
+# aquí).
 #
-# Mini ejercicio: pruebe importar la tabla hogares desde la interfaz de RStudio (import dataset). Compare las funciones:
-# 
-# - read_delim: para importar el archivo H_2018_Terceros.dat
-# 
-# - read_sav: para importar el archivo H_2018_TERCEROS.sav
+# Lea la ayuda de read.table y piense, para poder importar la tabla contenida en
+# el archivo paquetes.csv, qué opciones tengo que poner en los argumentos:
+#
+# - file:
+#
+# - sep:
+#
+# - header:
+#
+# Nota: los archivos csv se pueden abrir con notepad u otro editor de texto
+# plano... Incluso se pueden abrir con el editor de texto de RStudio (File >
+# Open File... aunque puede que demore un poco).
+#
+# Escriba aquí el comando:
 
-# Inspeccione las salidas y compare las diferencias.
 
-# En el botón import dataset tendremos muchas opciones, que van a depender de qué paquetes están instalados en el sistema...
-# En mi PC tengo la opción del readr que es un paquete bastante bueno, así que lo voy a usar:
+
+
+# Respuesta:
+pqts <- read.table(file = "datos/paquetes.csv", # Ruta (relativa) del archivo
+                   sep = ",", # Otras opciones comunes: \t (tabulaciones) y ;
+                   header = TRUE) # Si tiene encabezado
+View(pqts)
+class(pqts$name)  # Pensaríamos que era character, pero no
+levels(pqts$name) # Una cantidad excesiva de niveles...
+
+# Lo que ocurre es que las columnas con texto son interpretadas como factor por
+# defecto, lo cual puede pasar inadvertido y tiene algunas consecuencias
+# inesperadas.
+# 
+# Con read.table, la forma de evitar este inconveniente desde el principio es
+# con el argumento stringsAsFactor = FALSE:
+pqts <- read.table("datos/paquetes.csv", # Ruta (relativa) del archivo
+                   sep = ",", # Otras opciones comunes: \t (tabulaciones) y ;
+                   header = TRUE, # Si tiene encabezado
+                   stringsAsFactor = FALSE) # No a los factor!
+
+# Bueno, mejoramos, aunque...
+head(pqts)
+class(pqts$first_release) # Esto debería ser una fecha...
+
+# Esto se puede arreglar durante o posteriormente a la importación. 
+
+# Hoy en día hay herramientas más sofisticadas para importar datos y se integran
+# amablemente a la interfaz de RStudio...
+
+# En el botón import dataset tendremos muchas opciones, que van a depender de
+# qué paquetes están instalados en el sistema...
+#
+# Seleccione primero el paquete base y observe las opciones que figuran.
+# Identifique aquellas que se corresponden con los argumentos recién ensayados.
+# Observe además que tenemos un vistazo de las primeras líneas del archivo csv,
+# para que podamos identificar si tiene encabezado, cuál es el delimitador de
+# campos, etc...
+#
+# Vuelva a usar el botón Import Dataset, pero elija la opción readr ahora...
+# Antes de apretar el botón de importar, juege con las distintas opciones y
+# observe los cambios que cada una genera en la previsualización del objeto de
+# salida.
+#
+# En particular, observe las clases por defecto de las columnas name y
+# first_release: tienen un desplegable que permite ajustar la clase que nos
+# interesa para cada columna.
+#
+# Para la segunda columna (fecha), elija el tipo dateTime como formato. Note que
+# se nos pide ingresar el "format string", que no es más que una forma de
+# especificar dónde va qué parte de la fecha-hora (similar al excel). El valor por defecto es (en mi PC al menos):
+# 
+# %m/%d/%Y %H:%M
+#
+# Sin embargo, el que preciso es:
+# 
+# %Y-%m-%d %H:%M:%S
+#
+# En mi PC tengo la opción del readr que es un paquete bastante bueno, así que
+# lo voy a usar:
 library(readr)
-pqts <- read_csv(
-  "datos/paquetes.csv", 
-  col_types = cols(first_release = 
-                     col_datetime(format = "%Y-%m-%d %H:%M:%S")))
+pqts <- read_csv("datos/paquetes.csv", 
+  col_types = cols(first_release = col_datetime(format = "%Y-%m-%d %H:%M:%S")))
 
 # Más adelante veremos qué hacemos con estos warnings
 # 
 # La función cols puede ser de mucha ayuda...
-?cols
-
-# De todas formas, es bueno saber que R tiene la función read.table, que lee cualquier archivo en texto plano (txt, csv, dat), si le indicamos cuál es el separador correcto. Algunas funciones como read.csv son wrappers de read.table hechas para ahorrar tiempo.
-?read.table
-
-# Nota: cuando use read.table o read.csv, etc., tener en cuenta que los campos de texto son ingresados como factores, lo que puede generar confusiones, malestar y mareos. El argumento stringsAsFactors = FALSE es una buena opción para evitar tal transformación:
-# pqts <- read.csv("datos/paquetes.csv", stringsAsFactors = FALSE)
 
 # También se puede leer un archivo desde una URL en la web:
-# pqts <- read.csv("https://raw.githubusercontent.com/jumanbar/curso_camtrapR/master/clase_1/data/paquetes.csv")
+# pqts <- read_csv("https://raw.githubusercontent.com/jumanbar/curso_camtrapR/master/clase_1/data/paquetes.csv", 
+#   col_types = cols(first_release = col_datetime(format = "%Y-%m-%d %H:%M:%S")))
 
 # Nota: hay formas más primitivas de leer archvos:
-readLines("cdo.txt")
+readLines("datos/paquetes.csv", n = 6)
 scan("datos/numeritos.txt")
 
 # Mirar la tabla por arriba -----
-
 class(pqts)
 
 head(pqts) # La cabeza
@@ -897,35 +1013,75 @@ sapply(pqts, class)
 str(pqts)           # Un montón de información sobre pqts
 summary(pqts)       # Resumen de todas las columnas
 
-table(pqts$first_release) # Acá uso `$` para llamar a la variable
-table(pqts$Camera, pqts$Species)
-
 # Warning: 2 parsing failures.
 # row           col                    expected     actual                 file
 # 6103 first_release date like %Y-%m-%d %H:%M:%S 2014-03-04 'datos/paquetes.csv'
 # 7384 first_release date like %Y-%m-%d %H:%M:%S 2015-02-06 'datos/paquetes.csv'
 
-# Qué hacemos en estos casos? Es decisión de cada uno/a
-pqts[c(6103, 7384),]
-pqts[c(6103, 7384), 2] <-
-  ymd_hms(c("2014-03-04 12:00:00", "2015-02-06 12:00:00"))
+pqts[c(6103, 7384), ] # En esas filas, las fechas son NA
 
-table(pqts$versions)
-library(tidyverse)
-table(pqts$versions) %>% barplot()
+# El problema es que no reconoce los valores encontrados (2014-03-04 y
+# 2015-02-06) como fecha-hora, porque son sólo fecha. Hay muchas formas de
+# resolver este problema, pero vamos a proponer lo siguiente:
 
-# Alternativa: guardar fechas como character y luego modificarlas
+# Ejercicio 5 ----
+#
+# Sustituir esos dos valores problemáticos con una fecha-hora artificial, usando
+# las fechas que nos muestra el mensaje de advertencia y una hora arbitraria...
+# el mediodía, por ejemplo.
+#
+# Ahora, hay un detalle: precisamos crear dos valores de la clase
+# correspondiente (los datetime se llaman POSIXct). Hagamos un par de búsquedas
+# a ver q encontramos:
+??datetime
+??POSIXct
+#
+# Hagamos click en ymd_hms...
+?ymd_hms
+#
+# Esta será la función que debemos utilizar.
+# 
+# 5.a:
+# 
+# Cargue el paquete necesario para usar la función:
+
+# -------------+
+# 5.b:
+#
+# Escriba el comando necesario para crear un vector fecha-hora con estas dos
+# fechas y horas:
+# 
+# 4 de abril de 2014 a las 12 del mediodía
+# 
+# 6 de febrero de 2015 a las 12 del mediodía
+
+# -------------+
+# 5.c
+#
+# Utilice el comando anterior (o el resultado, mejor dicho) para modificar los
+# dos valores de first_release, de la tabla pqts, que no se importaron
+# correctamente:
+
+# (Nota: recuerde el uso de corchetes y/o $, junto con la asignación, para
+# modificar valores dentro de un vector).
+# -------------+
+
+
+# Nota: puedo importar todo como character y modificar las columnas
+# posteriormente:
 pqts2 <- read_csv("datos/paquetes.csv", 
                   col_types = cols(first_release = col_character()))
-# De esta forma no se pierde información
-# 
-# Es una alternativa útil cuando arreglar a mano no es una opción (por ejemplo, si la cantidad de mensajes de warning es excesiva). De todas formas, para arreglar la columna de una forma automatizada (o semi), tendremos que adquirir otras habilidades que veremos más adelante.
-# 
+#
+# De esta forma no se pierde información.
+#
+# Es una alternativa útil cuando arreglar a mano no es una opción (por ejemplo,
+# si la cantidad de mensajes de warning es excesiva). De todas formas, para
+# arreglar la columna de una forma automatizada (o semi), tendremos que adquirir
+# otras habilidades que veremos más adelante.
+#
 # Por qué no modificamos directamente la tabla en excel?
 
-# * Datos del ECH ----
 
-# Veremos ejemplos con el .dat y con el .sav
 
 # Exportar datos ----
 
@@ -947,52 +1103,36 @@ save(pqts, file = "salidas/paquetes.RData")
 
 load("datos/hum_got.RData")
 
-# Extras ----
 
-# * Arreglo automatizado ----
 
-pqts2$first_release %>% 
-  ymd_hms
+# * Datos del ECH 2018 ----
 
-w <- grep("[12][90][0-9]{2}-[01][0-9]-[0-3][0-9]", pqts2$first_release)
-length(w)
-nrow(pqts2)
+# Explore la forma de importar la tabla de hogares utilizando el archivo .sav...
 
-pqts2[-w,]
-w <- grep("[12][90][0-9]{2}-[01][0-9]-[0-3][0-9]$", 
-          pqts2$first_release)
-length(w)
-pqts2[w,]
-pqts2$first_release[w] <- 
-  paste(pqts2$first_release[w], "12:00:00")
+library(haven)
+hog <- read_sav("datos/ECH2018/H_2018_TERCEROS.sav")
 
-pqts2$first_release <- ymd_hms(pqts2$first_release)
+# Es una tabla grandecita:
+dim(hog)
+sapply(hog, class)
 
-pqts2 <- mutate(pqts2, first_release = ymd_hms(first_release))
+# Observación: figuran varias columnas de la clase "haven_labelled"... Podemos
+# ver qué implica esto en los siguientes ejemplos:
 
-# Algunos gráficos...
+hog[1:4] # Observar la columna dpto...
 
-library(tidyverse)
-pqts %>% 
-  mutate(year = year(first_release)) %>% 
-  pull(year) %>%
-  table %>% 
-  barplot()
+# Además... cómo es que 
+hog[1:4]
+hog[, 1:4]
+# Dan lo mismo?
 
-pqts %>% 
-  mutate(year = year(first_release)) %>% 
-  count(year) %>%
-  ggplot() +
-  aes(year, n) +
-  geom_col()
+View(hog[1:4]) # Vea las etiquetas de cada columna
 
-pqts %>% 
-  mutate(year = year(first_release)) %>% 
-  count(year) %>%
-  mutate(nacum = cumsum(n)) %>% 
-  ggplot() +
-  aes(year, nacum) +
-  geom_point()
+hog$dpto[1:5] # Los valores son numéricos, pero tienen etiquetas asociadas.
+attributes(hog$dpto)
+attr(hog$dpto, "label")
+attr(hog$dpto, "labels")
+
 
 # FIN ----
 
@@ -1027,17 +1167,30 @@ zona <- ifelse(dpto == "Montevideo", "A", "B")
 
 # 3.b: 
 #
-# Opción 1:
+# Opción 1a:
 zona <- rep.int("C", 19)
 zona[dpto == "Montevideo"]  <- "A"
 deptosCosteros <- c("Colonia", "San José", "Canelones", "Maldonado", "Rocha")
 zona[dpto %in% deptosCosteros] <- "B"
 
+# Opción 1b:
+zona[dpto == "Montevideo"]  <- "A"
+costa <- c("Colonia", "San José", "Canelones", "Maldonado", "Rocha")
+zona[dpto %in% costa] <- "B"
+zona[!(depto %in% c("Montevideo", costa))] <- "C"
+
+# Opción 1c:
+zona[dpto == "Montevideo"]  <- "A"
+zona[dpto == "Colonia" | dpto == "San José" | dpto == "Canelones" | 
+       dpto == "Maldonado" | dpto == "Rocha"] <- "B"
+zona[dpto != "Montevideo" & dpto != "Colonia" & dpto != "San José" &
+       dpto != "Canelones" & dpto != "Maldonado" & dpto != "Rocha"] <- "C"
+
 # Alternativamente:
-deptosCosteros <- c("Colonia", "San José", "Canelones", "Maldonado", "Rocha")
+costa <- c("Colonia", "San José", "Canelones", "Maldonado", "Rocha")
 zona <- case_when(
   dpto == "Montevideo" ~ "A",
-  dpto %in% deptosCosteros ~ "B",
+  dpto %in% costa ~ "B",
   TRUE ~ "C"
 )
 
@@ -1070,3 +1223,17 @@ paste0("Tengo unos ", cuantas.frutas, " ", names(cuantas.frutas), "s")
 t1 <- paste0(cuantas.frutas, " ", names(cuantas.frutas), "s")
 t2 <- paste0(t1[-length(t1)], collapse = ", ")
 paste0("Tengo unos ", t2, " y ", t1[length(t1)])
+
+
+# Ejercicio 5:
+# 
+# Precisamos el paquete lubridate:
+library(lubridate)
+
+# La función ymd_hms espera cierto tipo de formatos muy específicos de fecha y
+# hora, escritos entre comillas:
+fh <- ymd_hms(c("2014-03-04 12:00:00", "2015-02-06 12:00:00"))
+
+# Un par de formas de cambiar los valores que nos interesan:
+pqts[c(6103, 7384), 2] <- fh
+pqts$first_release[c(6103, 7384)] <- fh
