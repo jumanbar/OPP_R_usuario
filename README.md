@@ -26,6 +26,8 @@ Pinchar el archivo con el mouse y luego pinchar "view raw". En el menú que apar
 
 # Enlaces y materiales de interés:
 
+- [Recopilación gigantesca de recursos en línea!!](https://paulvanderlaken.com/2017/08/10/r-resources-cheatsheets-tutorials-books/)
+
 - La cuenta de Twitter en la que comparto noticias, materiales, y más: https://twitter.com/imser_
 
 - Repositorio del curso en línea IMSER, cuya última edición fue dada en el año 2013: https://github.com/jumanbar/Curso-R
