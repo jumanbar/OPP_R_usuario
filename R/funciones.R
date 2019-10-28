@@ -15,20 +15,21 @@ dic <- function(.data, .var) {
   require(magrittr)
   require(rlang)
   require(haven)
-  cat("\nColumn:", as.character(enquo(.var))[-1], "\n")
+  cat("\nColumna:", as.character(enquo(.var))[-1], "\n")
   v <- pull(.data, !!enquo(.var))
-  cat("Label:", attr(v, "label"), "\n")
-  cat("Class:", class(v), "\n")
+  cat("Descripción:", attr(v, "label"), "\n")
+  cat("Clase:", class(v), "\n\n")
 
   if (!is.labelled(v)) {
     if (is.factor(v)) {
-      cat("Labels:\n")
-      cat(levels(v), sep = "\n")
+      cat("Categorías:\n")
+      cat(paste("\t- ", levels(v)), sep = "\n")
     } else {
-      cat("\nNo labels available. Levels present:\n")
+      cat("\nNo hay etiquetas. Niveles encontrados:\n")
       v %>%
         unique() %>%
         sort() %>%
+        paste("\t- ", .) %>% 
         cat(sep = "\n")
     }
   } else {
