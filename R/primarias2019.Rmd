@@ -1,0 +1,44 @@
+---
+title: "Primarias 2019"
+date: "30 de octubre de 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Descripción
+
+Se grafican los resultados de las elecciones primarias del día 27-10-2019, buscando imitar el estilo
+del [Portal 180](180.com.uy):
+
+![](../misc/grafico_180.PNG)
+
+En el primer paso se genera la tabla con los datos:
+
+```{r tabla}
+
+v <- tibble(
+  candidato  = c("Martínez", "Lacalle", "Talvi", "Manini", "Vega", "Novick", 
+                 "Mieres", "Abella", "Salle", "Goldman", "Fernández"),
+  porcentaje = c(39.17, 28.59, 12.32, 10.88, 1.38, 1.09, .97, .81, .8, .26, .06)
+)
+```
+
+Para luego imprimir un gráfico de barras:
+
+```{r pressure, echo=FALSE}
+v %>% 
+  ggplot() +
+  aes(x = fct_inorder(candidato), y = porcentaje) +
+  # aes(x = fct_reorder(candidato, porcentaje, .desc = TRUE), y = porcentaje) + # También es viable
+  # aes(x = fct_relevel(v$candidato, v$candidato), y = porcentaje) +            # También es viable
+  geom_col(fill = "#f57f0a") +
+  guides(fill=FALSE) + 
+  geom_text(aes(y = 0), label = v$porcentaje)
+```
+
+Nota: se incluyen dos líneas comentadas que son tan válidas para manipular el orden del eje x del 
+gráfico como la primera (comando aes).
