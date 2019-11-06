@@ -14,8 +14,11 @@ hog <- read_sav("datos/ECH2018/H_2018_TERCEROS.sav")
 source('R/codac.R', encoding = "UTF-8")
 
 # Recordar esta sintaxis...
-fusion <- left_join(per, hog) %>% as_factor
+# fusion <- left_join(per, hog) %>% as_factor
 
+
+# Tablas de contingencia ----
+# 
 # Considerar este comando:
 count(fusion, c1, codac)
 
@@ -38,6 +41,8 @@ count(fusion, c1, codac)
 table(fusion$c1, fusion$codac) # ANCHO
 count(fusion, c1, codac)       # LARGO
 
+# Ensanchar -----
+# 
 # Funciones pivot:
 fusion %>% 
   count(c1, codac) %>% 
@@ -78,7 +83,8 @@ fusion %>%
     values_from = n) %>% 
   View
 
-
+# Alargar ------
+# 
 # Inversamente, pivot_longer hace el trabajo inverso.
 casacodac <-
   fusion %>% 
@@ -116,6 +122,8 @@ cntg <-
 
 
 # ────────────────────────────────
+
+# Con ggplot2 -------
 
 # Por qué es importante esta manipulación?
 # 
