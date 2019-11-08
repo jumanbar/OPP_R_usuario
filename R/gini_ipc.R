@@ -12,7 +12,7 @@
 # - Columnas mínimas: anio (integer), mes (integer), YHOG (numeric), pesoano
 # (numeric), depto (integer, factor o character)
 #
-# hog2017: ídem que hog2017
+# hog2017: ídem que hog2016
 #
 # Nota: el cálculo del índice Gini se hace a partir del YHOG (ingresos del
 # hogar no imputables a personas) multiplicado para el ajuste de ipc
