@@ -12,7 +12,7 @@
 # - Columnas mínimas: anio (integer), mes (integer), YHOG (numeric), pesoano
 # (numeric), depto (integer, factor o character)
 #
-# hog2017: ídem que hog2016
+# hog2017: ídem que hog2016, pero el nombre de YHOG es yhog.
 #
 # Nota: el cálculo del índice Gini se hace a partir del YHOG (ingresos del
 # hogar no imputables a personas) multiplicado para el ajuste de ipc
@@ -23,7 +23,10 @@
 library(acid)
 library(tidyverse)
 
+# Importar tablas:
 # tabla_ipc
+# hog2016
+# hog2017
 
 # Resultados ----
 bind_rows(
